@@ -1,0 +1,20 @@
+# Allowlist: this control repo only tracks its own files.
+# Each app folder in here is its own git repository and must stay untracked.
+/*
+!/.gitignore
+!/.github/
+!/.claude/
+!/CLAUDE.md
+!/README.md
+!/LICENSE
+!/projects.json
+!/site/
+!/scripts/
+!/ops/
+
+/.claude/settings.local.json
+/.claude/worktrees/
+/ops/run-log.md
+/ops/run.lock
+_site/
+node_modules/

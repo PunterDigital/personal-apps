@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Personal Apps</title>
+  <meta name="description" content="Downloads for PunterDigital personal apps.">
+  <link rel="icon" href="{{FAVICON}}" type="image/svg+xml">
+  <style>
+{{STYLES}}
+  </style>
+</head>
+<body>
+  <main>
+    <header class="top">
+      <h1>Personal Apps</h1>
+      <p class="muted">Latest builds of the PunterDigital personal apps. All open source.</p>
+    </header>
+
+    <section class="apps">
+{{APPS}}
+    </section>
+
+    <details class="help">
+      <summary>Installing unsigned builds</summary>
+      <p><strong>Windows:</strong> if SmartScreen says "Windows protected your PC", click
+        <em>More info</em> → <em>Run anyway</em>.</p>
+      <p><strong>macOS:</strong> open the <code>.dmg</code>, drag the app to Applications, then
+        right-click the app → <em>Open</em> → <em>Open</em>. If macOS says the app is damaged, run
+        <code>xattr -dr com.apple.quarantine "/Applications/&lt;App&gt;.app"</code> in Terminal.</p>
+    </details>
+
+    <footer class="muted">Updated {{BUILT_AT}} · <a href="https://github.com/PunterDigital/personal-apps">Source</a></footer>
+  </main>
+</body>
+</html>

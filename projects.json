@@ -1,0 +1,4 @@
+{
+  "$comment": "Registry of managed apps. platforms: web | windows | macos. assets: optional per-platform regex overrides for matching release asset filenames.",
+  "projects": []
+}
