@@ -1,4 +1,23 @@
 {
   "$comment": "Registry of managed apps. platforms: web | windows | macos. assets: optional per-platform regex overrides for matching release asset filenames.",
-  "projects": []
+  "projects": [
+    {
+      "name": "Nexus SSH",
+      "slug": "nexus-ssh",
+      "folder": "nexus-ssh",
+      "repo": "PunterDigital/nexus-ssh",
+      "tag": "nexus ssh",
+      "description": "A modern SSH terminal client with an encrypted vault you own: tabbed terminal, SFTP browser, key manager and file-based sync.",
+      "platforms": [
+        "windows",
+        "macos"
+      ],
+      "webUrl": null,
+      "assets": {
+        "windows": "Setup.*\\.exe$",
+        "macos": "\\.dmg$"
+      },
+      "status": "active"
+    }
+  ]
 }

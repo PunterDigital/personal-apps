@@ -133,6 +133,15 @@ For each card in Triage:
 ## Onboarding a new project folder
 
 1. **Inspect.** Stack, build system, how it runs, existing git remote, existing CI.
+   - **Check the folder is its own repo:** `git -C <folder> rev-parse --show-toplevel` must print the
+     folder itself. If it prints the control-repo root, the folder has no `.git` and every git command
+     would hit the control repo — run `git init -b main` in the folder first.
+   - Copied-in `node_modules` are usually broken (pnpm symlinks don't survive copies): delete and
+     reinstall from the lockfile before judging whether the project builds.
+   - Run the project's own build/typecheck/lint/tests first and record what's broken — that's the
+     baseline for the audit.
+   - Commit the code exactly as received as `Initial import` on `main`, then do all onboarding fixes
+     on a `claude/onboarding-ci` branch via PR, so the audit trail shows what changed.
 2. **Repo.** If no remote → create `PunterDigital/<folder-name>` (`gh repo create --public --source`).
    If a remote exists in PunterDigital and is private → do the secret scan first, then make public
    (`gh repo edit --visibility public --accept-visibility-change-consequences`).
@@ -150,6 +159,8 @@ For each card in Triage:
 7. **Repo settings.** Branch protection on `main` requiring CI; Dependabot (npm + github-actions, weekly);
    squash merge only; delete branch on merge.
 8. **E2E.** If the project has no E2E tests, add a Playwright smoke test covering launch + core flow.
+   Desktop apps must support an isolated profile for tests (env var → `app.setPath('userData', …)`)
+   so tests never touch Shay's real data. Run the E2E against the packaged app too, not just dev.
 9. **Registry.** Add the entry to `projects.json`; make sure the GroundStation tag exists.
 10. **Audit report.** Create a card in Personal Apps titled `Audit: <name>` (tagged with the project
     tag + `claude`) summarising findings: code quality, security, dependencies, tests, pipelines.
