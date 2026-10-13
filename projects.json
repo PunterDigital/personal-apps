@@ -47,6 +47,24 @@
         "android": "\\.apk$"
       },
       "status": "active"
+    },
+    {
+      "name": "Finance Dashboard",
+      "slug": "finance-dashboard",
+      "folder": "personal-finance",
+      "repo": "PunterDigital/finance-dashboard",
+      "tag": "finance dashboard",
+      "description": "A local-first personal finance dashboard: transactions, CSV import from any bank, multi-currency FX, burn rate, recurring payments and transfer matching. Your data never leaves your machine.",
+      "platforms": [
+        "windows",
+        "macos"
+      ],
+      "webUrl": null,
+      "assets": {
+        "windows": "Setup-.*\\.exe$",
+        "macos": "universal\\.dmg$"
+      },
+      "status": "active"
     }
   ]
 }
