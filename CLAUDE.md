@@ -185,6 +185,9 @@ For each card in Triage:
   and silently skipped), and it skips all signing on PR builds. Set `identity: null` and ad-hoc sign in
   an `afterPack` hook (`codesign --force --deep --sign -`). CI must run
   `codesign --verify --deep --strict` on every `.app`.
+- Universal macOS (`arch: [universal]`): `afterPack` fires on the x64/arm64 `*-temp` builds and again on
+  the merged app. Skip `appOutDir` ending in `-temp` in the signing hook, or the merge fails with
+  "Expected all non-binary files to have identical SHAs ... CodeResources".
 - Run the E2E suite against the packaged app in CI, not just the dev build.
 - `main` is branch-protected with required checks, so version bumps go through a PR too.
 - Switching between branches with different Electron majors: `pnpm install` relinks, but Electron's own
