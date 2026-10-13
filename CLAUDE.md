@@ -178,6 +178,9 @@ For each card in Triage:
 - Don't let electron-builder rebuild native modules (`npmRebuild: false`): its bundled node-gyp can't
   find Visual Studio on `windows-latest` and needs Python `distutils` on macOS. Prefer N-API modules with
   prebuilt binaries; for the macOS x64 build, download the x64 prebuilt next to the arm64 one in CI.
+- For SQLite, use Node's built-in `node:sqlite` (Node 24 / Electron 44) instead of better-sqlite3: no
+  native module, no ABI rebuild, and a universal macOS build just works. A ~40-line wrapper keeps the
+  better-sqlite3 `prepare`/`pragma`/`transaction` surface (Finance Dashboard `server/db.ts`).
 - Unsigned macOS: electron-builder 25 can't ad-hoc sign (`identity: '-'` is treated as a keychain name
   and silently skipped), and it skips all signing on PR builds. Set `identity: null` and ad-hoc sign in
   an `afterPack` hook (`codesign --force --deep --sign -`). CI must run
