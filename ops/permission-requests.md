@@ -6,4 +6,4 @@ entry is marked resolved.
 
 | Date | Tool / command | Why it was needed | Times hit | Status |
 |---|---|---|---|---|
-| 2026-10-13 | Write `.claude/settings.json` (initial allowlist) | Unattended runs need git/gh/npm/GroundStation without prompts. Proposed file: `ops/proposed-claude-settings.json` | 1 | Awaiting Shay |
+| 2026-10-13 | Write `.claude/settings.json` (initial allowlist) | Unattended runs need git/gh/npm/GroundStation without prompts | 1 | Approved 2026-10-13 |
