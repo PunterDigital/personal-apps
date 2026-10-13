@@ -145,6 +145,7 @@ For each card in Triage:
      reinstall from the lockfile before judging whether the project builds.
    - Run the project's own build/typecheck/lint/tests first and record what's broken — that's the
      baseline for the audit.
+   - If the folder already has its own clean git history, push that as-is (no `Initial import`).
    - Commit the code exactly as received as `Initial import` on `main`, then do all onboarding fixes
      on a `claude/onboarding-ci` branch via PR, so the audit trail shows what changed.
 2. **Repo.** If no remote → create `PunterDigital/<folder-name>` (`gh repo create --public --source`).
@@ -202,6 +203,24 @@ For each card in Triage:
   reset it. Apps that auto-lock on system idle need an E2E env hook to turn that off.
 - E2E clicks: click a specific spot, not the element centre, when the element contains nested
   buttons (e.g. breadcrumbs). CI runners have different home paths and window sizes.
+
+**Tauri 2 (Rust + system webview)**
+- E2E: Playwright can't launch Tauri, but WebView2 speaks CDP. Mark the window `create: false` and build
+  it in `setup` with `WebviewWindowBuilder::from_config`; when a test env var is set, add
+  `additional_browser_args("<wry defaults> --remote-debugging-port=<n>")` and a temp `data_directory`.
+  Then `chromium.connectOverCDP` (no Playwright browser download needed). Don't rely on the
+  `WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS` / `WEBVIEW2_USER_DATA_FOLDER` env vars: they work locally but
+  GitHub's Windows runners ignore them. Windows only. macOS (WKWebView) CI gets a universal build,
+  `codesign --verify`, and a launch smoke test. Isolate app data with an env var the Rust side reads in
+  place of `app_data_dir()`.
+- Unsigned macOS: `bundle.macOS.signingIdentity: "-"` ad-hoc signs. Build
+  `--target universal-apple-darwin` with both Rust targets installed.
+- Tauri's build script requires `frontendDist` (`dist/`) to exist, even for `cargo clippy`/`test`:
+  build the frontend first.
+- A copied-in `src-tauri/target` from another path fails with "failed to read plugin permissions …
+  app_hide.toml": delete it, the same as copied `node_modules`.
+- Release: create the GitHub Release (`gh release create --generate-notes`) in a first job, then
+  `tauri-action` with the same `tagName` uploads to it from each OS. Finish with an asset-check job.
 
 **Laravel web apps (Forge-hosted)**
 - No desktop builds: CI is one ubuntu job (Pint, `npm run build`, Pest, Playwright E2E). Forge
