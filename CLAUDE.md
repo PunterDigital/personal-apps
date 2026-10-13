@@ -28,12 +28,15 @@ source of truth for *how* work is done. Update it when the process changes.
   use the `claude` tag instead.
 - **GitHub.** Org `PunterDigital` (free plan; Shay is admin). All app repos are **public** (unlimited
   Actions minutes, incl. macOS runners). Licence: MIT unless the project already has one.
-- **Platforms.** Priority order: **Web**, **Windows**, **macOS**. No Linux/mobile unless a card asks.
+- **Platforms.** Priority order: **Web**, **Windows**, **macOS**. No Linux/mobile unless a card asks,
+  except native **Android** apps (e.g. World Explorer), which ship a sideloadable `.apk` per release.
 - **Signing.** Builds are unsigned. The downloads page explains the SmartScreen / Gatekeeper bypass.
 - **Repo owner.** App repos default to `PunterDigital`, but Shay may keep one on his personal account
   (`ShayPunter/…`). The registry `repo` field is authoritative; don't transfer without asking.
 - **Machine.** Windows 11, Node 24, git, gh, PHP 8.3 + Composer (via pvm), Docker. No .NET SDK.
-  Cannot run macOS builds locally — macOS is verified by CI only.
+  Cannot run macOS builds locally — macOS is verified by CI only. Android SDK (with emulator) in
+  `%LOCALAPPDATA%\Android\Sdk`; JDK 21 at `C:\Program Files\Java\jdk-21.0.11` (`JAVA_HOME` points at
+  Android Studio's JDK 25 JBR, which older Gradle can't run on).
 
 ## Board (Personal Apps card table)
 
@@ -206,6 +209,20 @@ For each card in Triage:
   the top of `playwright.config.js` — workers re-load the config after the server has migrated.
   A stale `public/hot` makes pages load from a dead Vite dev server (blank page): delete it.
 - `pint` isn't always idempotent; run `pint --test` after `pint`.
+
+**Android (Kotlin + Gradle)**
+- Set `JAVA_HOME` to JDK 21 before `./gradlew`: Gradle < 9 dies on JDK 25 with a bare "25.0.2" error.
+- CI on `ubuntu-latest`: build job (lint, unit tests, debug + release APKs) and an E2E job that
+  enables KVM and runs `connectedDebugAndroidTest` + an install-and-launch smoke test of the
+  minified release APK via `reactivecircus/android-emulator-runner` (`google_apis` image, since fused
+  location needs Play services). Locally, use a Gradle managed device; AGP downloads the image.
+- **Never run `connectedAndroidTest` on Shay's phone**: AGP uninstalls the app afterwards, wiping
+  its data. Instrumented tests should `assumeTrue(isEmulator)` before touching DB/prefs.
+- Unsigned APKs can't be installed. Releases are signed with the repo's (public) debug keystore so
+  they update over existing installs; changing the signing key forces an uninstall (data loss).
+- Never use a self-hosted runner on a public repo: fork PRs would run on that machine.
+- Git Bash: turn `$LOCALAPPDATA` into a POSIX path with `cygpath -u` before adding it to `PATH`, and
+  set `MSYS_NO_PATHCONV=1` for `adb shell` commands with `/sdcard/...` paths.
 
 **Secret scanning.** gitleaks via Docker. Bind-mounting `E:\` paths fails in this Docker setup, so
 pipe the repo in:

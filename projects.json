@@ -1,5 +1,5 @@
 {
-  "$comment": "Registry of managed apps. platforms: web | windows | macos. assets: optional per-platform regex overrides for matching release asset filenames.",
+  "$comment": "Registry of managed apps. platforms: web | windows | macos | android. assets: optional per-platform regex overrides for matching release asset filenames.",
   "projects": [
     {
       "name": "Nexus SSH",
@@ -30,6 +30,22 @@
         "web"
       ],
       "webUrl": "https://mymilliondollargrid.com/",
+      "status": "active"
+    },
+    {
+      "name": "World Explorer",
+      "slug": "world-explorer",
+      "folder": "world-explorer",
+      "repo": "PunterDigital/world-explorer",
+      "tag": "world explorer",
+      "description": "An Android app that fogs the world map and burns it away as you walk, cycle or drive, tracking how much of the planet you've explored.",
+      "platforms": [
+        "android"
+      ],
+      "webUrl": null,
+      "assets": {
+        "android": "\\.apk$"
+      },
       "status": "active"
     }
   ]

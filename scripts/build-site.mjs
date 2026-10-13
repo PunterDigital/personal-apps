@@ -12,8 +12,9 @@ const token = process.env.GITHUB_TOKEN || process.env.GH_TOKEN;
 const DEFAULT_ASSETS = {
   windows: '\\.(exe|msi)$',
   macos: '\\.dmg$',
+  android: '\\.apk$',
 };
-const PLATFORM_LABELS = { web: 'Web', windows: 'Windows', macos: 'macOS' };
+const PLATFORM_LABELS = { web: 'Web', windows: 'Windows', macos: 'macOS', android: 'Android' };
 
 const esc = (s) =>
   String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
