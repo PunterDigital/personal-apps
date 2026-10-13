@@ -179,6 +179,17 @@ For each card in Triage:
   `codesign --verify --deep --strict` on every `.app`.
 - Run the E2E suite against the packaged app in CI, not just the dev build.
 - `main` is branch-protected with required checks, so version bumps go through a PR too.
+- Switching between branches with different Electron majors: `pnpm install` relinks, but Electron's own
+  `install.js` (old `extract-zip`) can silently extract only one file under Node 24, leaving
+  "Electron failed to install correctly". Fix: expand the cached zip from `%LOCALAPPDATA%\electron\Cache`
+  into `node_modules/.pnpm/electron@<v>/node_modules/electron/dist` and write `path.txt` = `electron.exe`.
+- Scheduled runs happen on an unattended machine: OS idle time is high and Playwright input doesn't
+  reset it. Apps that auto-lock on system idle need an E2E env hook to turn that off.
+- E2E clicks: click a specific spot, not the element centre, when the element contains nested
+  buttons (e.g. breadcrumbs). CI runners have different home paths and window sizes.
+
+**Card ordering note.** An L card that's been split stays in Ready *on hold* as the tracker. It is
+not picked up by the build step, and it moves to Done once all its pieces are released.
 
 ## Weekly maintenance (Monday run, before the release train)
 
