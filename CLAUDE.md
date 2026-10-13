@@ -183,6 +183,10 @@ For each card in Triage:
   `install.js` (old `extract-zip`) can silently extract only one file under Node 24, leaving
   "Electron failed to install correctly". Fix: expand the cached zip from `%LOCALAPPDATA%\electron\Cache`
   into `node_modules/.pnpm/electron@<v>/node_modules/electron/dist` and write `path.txt` = `electron.exe`.
+- Electron 44+ downloads its binary lazily on first `require('electron')`. With parallel Playwright
+  workers on a fresh CI runner, two workers race on the download and one launches a half-extracted
+  app (`dyld: ... load command content extends beyond end of file`). Resolve `electron` once in a
+  Playwright `globalSetup` before workers start.
 - Scheduled runs happen on an unattended machine: OS idle time is high and Playwright input doesn't
   reset it. Apps that auto-lock on system idle need an E2E env hook to turn that off.
 - E2E clicks: click a specific spot, not the element centre, when the element contains nested
