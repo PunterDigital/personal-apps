@@ -167,6 +167,19 @@ For each card in Triage:
     Each fix-worthy finding becomes its own card in Triage/Ready.
 11. **First release** once CI is green, then the downloads page picks it up.
 
+## Platform notes (learned the hard way)
+
+**Electron + electron-builder**
+- Don't let electron-builder rebuild native modules (`npmRebuild: false`): its bundled node-gyp can't
+  find Visual Studio on `windows-latest` and needs Python `distutils` on macOS. Prefer N-API modules with
+  prebuilt binaries; for the macOS x64 build, download the x64 prebuilt next to the arm64 one in CI.
+- Unsigned macOS: electron-builder 25 can't ad-hoc sign (`identity: '-'` is treated as a keychain name
+  and silently skipped), and it skips all signing on PR builds. Set `identity: null` and ad-hoc sign in
+  an `afterPack` hook (`codesign --force --deep --sign -`). CI must run
+  `codesign --verify --deep --strict` on every `.app`.
+- Run the E2E suite against the packaged app in CI, not just the dev build.
+- `main` is branch-protected with required checks, so version bumps go through a PR too.
+
 ## Weekly maintenance (Monday run, before the release train)
 
 - Review and merge green Dependabot PRs (patch/minor); majors become cards.
