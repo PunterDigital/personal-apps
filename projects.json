@@ -18,6 +18,19 @@
         "macos": "\\.dmg$"
       },
       "status": "active"
+    },
+    {
+      "name": "My Million Dollar Grid",
+      "slug": "million-dollar-challenge",
+      "folder": "million-dollar-challenge",
+      "repo": "ShayPunter/million-dollar-challenge",
+      "tag": "million dollar grid",
+      "description": "Track your journey to $1,000,000: every $1,000 you earn fills one square of a 1,000-square grid you can share.",
+      "platforms": [
+        "web"
+      ],
+      "webUrl": "https://mymilliondollargrid.com/",
+      "status": "active"
     }
   ]
 }

@@ -30,8 +30,10 @@ source of truth for *how* work is done. Update it when the process changes.
   Actions minutes, incl. macOS runners). Licence: MIT unless the project already has one.
 - **Platforms.** Priority order: **Web**, **Windows**, **macOS**. No Linux/mobile unless a card asks.
 - **Signing.** Builds are unsigned. The downloads page explains the SmartScreen / Gatekeeper bypass.
-- **Machine.** Windows 11, Node 24, git, gh. No .NET SDK. Cannot run macOS builds locally — macOS is
-  verified by CI only.
+- **Repo owner.** App repos default to `PunterDigital`, but Shay may keep one on his personal account
+  (`ShayPunter/…`). The registry `repo` field is authoritative; don't transfer without asking.
+- **Machine.** Windows 11, Node 24, git, gh, PHP 8.3 + Composer (via pvm), Docker. No .NET SDK.
+  Cannot run macOS builds locally — macOS is verified by CI only.
 
 ## Board (Personal Apps card table)
 
@@ -191,6 +193,24 @@ For each card in Triage:
   reset it. Apps that auto-lock on system idle need an E2E env hook to turn that off.
 - E2E clicks: click a specific spot, not the element centre, when the element contains nested
   buttons (e.g. breadcrumbs). CI runners have different home paths and window sizes.
+
+**Laravel web apps (Forge-hosted)**
+- No desktop builds: CI is one ubuntu job (Pint, `npm run build`, Pest, Playwright E2E). Forge
+  auto-deploys `main` on push, so every merge is a production deploy; check the live site after.
+  A release is a tag + GitHub Release with notes; registry entry is `platforms: ["web"]` + `webUrl`.
+- `phpunit.xml` must force in-memory SQLite: Breeze's Pest suite uses `RefreshDatabase` and would
+  otherwise wipe the `.env` database.
+- Feature tests render Blade and need the Vite manifest: build assets before `php artisan test`.
+- E2E: Playwright `webServer` runs `php artisan serve` with env-var overrides (env beats `.env` in
+  Laravel) pointing at a throwaway SQLite file. Reset that file inside the webServer command, not at
+  the top of `playwright.config.js` — workers re-load the config after the server has migrated.
+  A stale `public/hot` makes pages load from a dead Vite dev server (blank page): delete it.
+- `pint` isn't always idempotent; run `pint --test` after `pint`.
+
+**Secret scanning.** gitleaks via Docker. Bind-mounting `E:\` paths fails in this Docker setup, so
+pipe the repo in:
+`tar --exclude=./node_modules --exclude=./vendor -cf - . | docker run --rm -i --entrypoint sh zricethezav/gitleaks:v8.21.2 -c 'mkdir /repo && tar xf - -C /repo && git config --global --add safe.directory /repo && gitleaks git /repo --no-banner && gitleaks dir /repo --no-banner'`.
+Don't pass `-v` to the `dir` scan — it prints secrets from local `.env` files into the transcript.
 
 **Card ordering note.** An L card that's been split stays in Ready *on hold* as the tracker. It is
 not picked up by the build step, and it moves to Done once all its pieces are released.
