@@ -240,7 +240,11 @@ For each card in Triage:
 - Breeze shares `auth.user` (the full model) with every Inertia page. Leak checks on public pages
   must run as a guest (fresh Playwright context), or they flag the viewer's own email.
 - Forge deploys can be confirmed by watching the `build/assets/app-*.js` hash on the live homepage
-  change (the hash differs from a local build).
+  change (the hash differs from a local build). A server-only change, or a deploy that finished
+  before you started watching, won't move the hash: check the changed behaviour on the live site
+  with `curl` instead.
+- After rebasing a branch, run `npm run build` again before E2E: a stale `public/build` from before
+  the rebase makes Playwright fail on UI that is already in the code.
 
 **Android (Kotlin + Gradle)**
 - Set `JAVA_HOME` to JDK 21 before `./gradlew`: Gradle < 9 dies on JDK 25 with a bare "25.0.2" error.
