@@ -44,7 +44,7 @@ source of truth for *how* work is done. Update it when the process changes.
 |---|---|---|
 | Triage | 23 | New cards. Untouched by Claude until triaged |
 | Not Now | 24 | Triaged as "later" — deliberately parked, with a reason comment |
-| Needs Info | 25 | Waiting on Shay; questions are in the comments; card tagged `needs answer` |
+| Needs Info | 25 | Waiting on Shay; questions in a comment (or the description of a Claude-created card); tagged `needs answer` |
 | Ready | 26 | Triaged, clear, sized; next to be picked up |
 | In Progress | 28 | Being built on a feature branch |
 | Testing & CI | 29 | Built; local E2E testing and/or PR pipelines running |
@@ -71,8 +71,16 @@ Runs every 3 hours, 09:00–21:00 local. Each run:
    (squash), move to *Awaiting Release*, comment. Red → read logs, fix, push; after 3 failed fix
    attempts tag `blocked`, comment with the failure summary, leave it.
    Cards in *In Progress* left by a crashed run: resume from the branch.
-4. **Answers.** Cards in *Needs Info*: read comments. If Shay commented after Claude's latest question,
-   remove `needs answer`, re-triage with the new info. If unanswered for 7 days, push-notify once.
+4. **Answers.** For **every** card in *Needs Info*, fetch the thread (`get_card` or `list_comments`).
+   Never decide from the board's `commentCount`, because it doesn't say who wrote the comments.
+   Claude's questions may be in the card **description** (cards Claude created) or in a `🤖 Claude:`
+   comment. Any comment **without** the `🤖 Claude:` prefix that is newer than Claude's latest
+   question (the description counts as written at card creation) is Shay's answer. Remove
+   `needs answer`, reply `🤖 Claude: Thanks — …` with what you'll do, and re-triage with the new info
+   (usually → Ready with acceptance criteria). If unanswered for 7 days, push-notify once.
+   Shay also comments on cards in other columns (objections on Ready cards, notes on In Progress).
+   Read the full comment thread of any card before you build, merge or release it, and act on any
+   un-prefixed comment newer than Claude's last one.
 5. **Triage.** Every card in *Triage* (see **Triage rules**).
 6. **Build.** Take the top card from *Ready* (order: `hotfix` > `bug` > due date > oldest). Run the
    **Feature workflow**. Do up to 2 cards per run if time allows; never leave a card half-done without
@@ -93,6 +101,8 @@ For each card in Triage:
      + planned approach in 1–3 lines. Tag `claude` and `size: x`.
    - **Needs Info** — real ambiguity that changes what gets built. Comment with numbered questions,
      each with Claude's recommended default ("If you don't mind, I'll do X"). Tag `needs answer`.
+     When Claude creates a card that needs an answer, the description holds the context and the
+     questions still go in a `🤖 Claude:` comment, so each card follows one pattern.
      Do not ask questions with obvious conventional answers — pick the default and note it.
    - **Not Now** — out of scope, huge, or blocked by something external. Comment the reason.
    - **L-size** → split into S/M cards (create_card, same tags, straight into Ready), comment on the
