@@ -272,6 +272,11 @@ For each card in Triage:
   `settings put global hide_error_dialogs 1` and force-stop `com.google.android.apps.nexuslauncher`.
   On failure, dump `mCurrentFocus`, ANRs/crashes from logcat, and a screenshot (World Explorer `ci.yml`).
   `android-emulator-runner` runs each `script:` line on its own, so a `|| { …; }` block must stay on one line.
+- Reproducing boot/reboot bugs: the Gradle managed device can't be rebooted, so copy its
+  `config.ini` (`~/.android/avd/gradle-managed/...`) into a scratch AVD dir, drop the
+  `disk.dataPartition.path = <temp>` and `fastboot.*` lines, and boot it with `ANDROID_AVD_HOME`
+  pointing there (write the `.ini` `path=` with forward slashes). After `pm grant`, wait ~30 s and
+  `adb shell sync` before `adb reboot`, or the grants are lost. Don't touch the managed AVD itself.
 - Git Bash: turn `$LOCALAPPDATA` into a POSIX path with `cygpath -u` before adding it to `PATH`, and
   set `MSYS_NO_PATHCONV=1` for `adb shell` commands with `/sdcard/...` paths.
 
