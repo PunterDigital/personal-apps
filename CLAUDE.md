@@ -284,11 +284,11 @@ pipe the repo in:
 `tar --exclude=./node_modules --exclude=./vendor -cf - . | docker run --rm -i --entrypoint sh zricethezav/gitleaks:v8.21.2 -c 'mkdir /repo && tar xf - -C /repo && git config --global --add safe.directory /repo && gitleaks git /repo --no-banner && gitleaks dir /repo --no-banner'`.
 Don't pass `-v` to the `dir` scan — it prints secrets from local `.env` files into the transcript.
 
-**Downloads page redeploys.** A `workflow_dispatch` of `pages.yml` from the same control-repo commit
-as the live deployment can "succeed" (`Reported success!`, `pages_build_version` = that commit) and
-still leave the old page up. The page did not update after a release until a new commit was pushed.
-If the page still shows the old version, push a control-repo commit (the run's playbook/registry
-change, or an empty `chore: rebuild downloads page` commit) and check again, with a cache-busting query.
+**Downloads page redeploys.** GitHub Pages' CDN caches the page for up to 10 minutes
+(`Cache-Control: max-age=600`), and a `?t=` query string does not get past it. After a successful
+`pages.yml` run, check `curl -sI` `Last-Modified` (it should be after the deploy time) or retry for
+~10 minutes before deciding the rebuild failed. Two deploys a few minutes apart can fail with "in
+progress deployment. Please cancel … first". That's harmless if the earlier deploy has the new release.
 
 **Card ordering note.** An L card that's been split stays in Ready *on hold* as the tracker. It is
 not picked up by the build step, and it moves to Done once all its pieces are released.
