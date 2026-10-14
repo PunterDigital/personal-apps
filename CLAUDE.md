@@ -26,14 +26,18 @@ source of truth for *how* work is done. Update it when the process changes.
 - **Identity.** The GroundStation connection acts as Shay. Every comment Claude writes MUST start with
   `🤖 Claude:`. Any comment *without* that prefix is Shay's. Never assign cards to Shay to mean "Claude";
   use the `claude` tag instead.
-- **GitHub.** Org `PunterDigital` (free plan; Shay is admin). All app repos are **public** (unlimited
+- **GitHub.** Org `PunterDigital` (free plan; Shay is admin). App repos are **public** by default (unlimited
   Actions minutes, incl. macOS runners). Licence: MIT unless the project already has one.
+  Exception: Shay can keep a repo **private** (registry `private: true`, e.g. Obsidian Resource Pack
+  Hosting). Never change visibility or add a licence to a private repo without asking. See
+  **Private repos** under Platform notes.
 - **Platforms.** Priority order: **Web**, **Windows**, **macOS**. No Linux/mobile unless a card asks,
   except native **Android** apps (e.g. World Explorer), which ship a sideloadable `.apk` per release.
 - **Signing.** Builds are unsigned. The downloads page explains the SmartScreen / Gatekeeper bypass.
 - **Repo owner.** App repos default to `PunterDigital`, but Shay may keep one on his personal account
   (`ShayPunter/…`). The registry `repo` field is authoritative; don't transfer without asking.
-- **Machine.** Windows 11, Node 24, git, gh, PHP 8.3 + Composer (via pvm), Docker. No .NET SDK.
+- **Machine.** Windows 11, Node 24, git, gh, PHP 8.3 (default) and 8.4 + Composer (via pvm; the
+  `composer` shim always uses 8.3, so for 8.4 run `php <8.4 dir>/composer/composer.phar`), Docker. No .NET SDK.
   Cannot run macOS builds locally — macOS is verified by CI only. Android SDK (with emulator) in
   `%LOCALAPPDATA%\Android\Sdk`; JDK 21 at `C:\Program Files\Java\jdk-21.0.11` (`JAVA_HOME` points at
   Android Studio's JDK 25 JBR, which older Gradle can't run on).
@@ -231,6 +235,17 @@ For each card in Triage:
   app_hide.toml": delete it, the same as copied `node_modules`.
 - Release: create the GitHub Release (`gh release create --generate-notes`) in a first job, then
   `tauri-action` with the same `tagName` uploads to it from each OS. Finish with an asset-check job.
+
+**Private repos (free plan)**
+- No branch protection or rulesets (needs GitHub Pro): there are no required checks, so confirm CI
+  is green yourself before merging.
+- Actions minutes are capped (2,000/month), so a self-hosted runner is fine and preferred, but only
+  while the repo is private. Move CI to GitHub-hosted runners *before* any visibility change.
+- The downloads page can't read a private repo's releases (the Pages token only sees public repos)
+  and its source link would 404, so `private: true` makes `build-site.mjs` skip both and show
+  just the web link. Releases are still tagged and published in the repo.
+- `gh api .../actions/runners` needs `admin:org`, which the gh token lacks: the runner's health
+  is only visible through whether jobs get picked up.
 
 **Laravel web apps (Forge-hosted)**
 - No desktop builds: CI is one ubuntu job (Pint, `npm run build`, Pest, Playwright E2E). Forge

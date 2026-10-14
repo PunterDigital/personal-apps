@@ -1,5 +1,5 @@
 {
-  "$comment": "Registry of managed apps. platforms: web | windows | macos | android. assets: optional per-platform regex overrides for matching release asset filenames.",
+  "$comment": "Registry of managed apps. platforms: web | windows | macos | android. assets: optional per-platform regex overrides for matching release asset filenames. private: true for a private repo (the downloads page skips the release lookup and the source link).",
   "projects": [
     {
       "name": "Nexus SSH",
@@ -82,6 +82,20 @@
         "windows": "Setup-.*\\.exe$",
         "macos": "universal\\.dmg$"
       },
+      "status": "active"
+    },
+    {
+      "name": "Obsidian Resource Pack Hosting",
+      "slug": "obsidian-resourcepack-hosting",
+      "folder": "obsidian-resourcepack-hosting",
+      "repo": "PunterDigital/obsidian-resourcepack-hosting",
+      "tag": "obsidian resourcepack hosting",
+      "description": "Free Minecraft resource pack hosting by Obsidian Servers: upload a pack, get a direct download link and SHA1 hash for server.properties. No account needed.",
+      "platforms": [
+        "web"
+      ],
+      "webUrl": "https://mcpacks.dev/",
+      "private": true,
       "status": "active"
     }
   ]
