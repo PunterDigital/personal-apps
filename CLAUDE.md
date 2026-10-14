@@ -267,8 +267,17 @@ For each card in Triage:
 - Unsigned APKs can't be installed. Releases are signed with the repo's (public) debug keystore so
   they update over existing installs; changing the signing key forces an uninstall (data loss).
 - Never use a self-hosted runner on a public repo: fork PRs would run on that machine.
+- CI emulator flake: the cold-booted Pixel Launcher can ANR, and its dialog steals focus, so every
+  Espresso test fails with `RootViewWithoutFocusException`. Before the tests, run
+  `settings put global hide_error_dialogs 1` and force-stop `com.google.android.apps.nexuslauncher`.
+  On failure, dump `mCurrentFocus`, ANRs/crashes from logcat, and a screenshot (World Explorer `ci.yml`).
+  `android-emulator-runner` runs each `script:` line on its own, so a `|| { …; }` block must stay on one line.
 - Git Bash: turn `$LOCALAPPDATA` into a POSIX path with `cygpath -u` before adding it to `PATH`, and
   set `MSYS_NO_PATHCONV=1` for `adb shell` commands with `/sdcard/...` paths.
+
+**Updating a PR branch after another PR merged.** Don't force-push a rebase. Rebase locally and test,
+then push a merge commit with that exact tree on top of the remote branch:
+`git commit-tree $(git rev-parse HEAD^{tree}) -p origin/<branch> -p main`.
 
 **Secret scanning.** gitleaks via Docker. Bind-mounting `E:\` paths fails in this Docker setup, so
 pipe the repo in:
