@@ -295,6 +295,11 @@ For each card in Triage:
 - Git Bash: turn `$LOCALAPPDATA` into a POSIX path with `cygpath -u` before adding it to `PATH`, and
   set `MSYS_NO_PATHCONV=1` for `adb shell` commands with `/sdcard/...` paths.
 
+**Built-in browser on an unattended run.** The pane may never draw (viewport 0x0, then "Could not
+get the tab ready for input" on clicks). `read_page`, `find`, `form_input`, `get_page_text` and
+`javascript_tool` still work: fill fields with `form_input` and submit with
+`form.requestSubmit()` or a button `.click()` in `javascript_tool`.
+
 **Updating a PR branch after another PR merged.** Don't force-push a rebase. Rebase locally and test,
 then push a merge commit with that exact tree on top of the remote branch:
 `git commit-tree $(git rev-parse HEAD^{tree}) -p origin/<branch> -p main`.
