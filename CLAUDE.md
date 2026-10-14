@@ -234,6 +234,13 @@ For each card in Triage:
   the top of `playwright.config.js` — workers re-load the config after the server has migrated.
   A stale `public/hot` makes pages load from a dead Vite dev server (blank page): delete it.
 - `pint` isn't always idempotent; run `pint --test` after `pint`.
+- Composer 2.9 refuses to resolve any package version with a known advisory (`block-insecure`).
+  Every Laravel 11.x is affected (fixes only in 12+), so `composer update` fails outright. Use
+  `COMPOSER_NO_SECURITY_BLOCKING=1` for an in-range update and card the major upgrade.
+- Breeze shares `auth.user` (the full model) with every Inertia page. Leak checks on public pages
+  must run as a guest (fresh Playwright context), or they flag the viewer's own email.
+- Forge deploys can be confirmed by watching the `build/assets/app-*.js` hash on the live homepage
+  change (the hash differs from a local build).
 
 **Android (Kotlin + Gradle)**
 - Set `JAVA_HOME` to JDK 21 before `./gradlew`: Gradle < 9 dies on JDK 25 with a bare "25.0.2" error.
