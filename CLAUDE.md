@@ -40,7 +40,8 @@ source of truth for *how* work is done. Update it when the process changes.
   `composer` shim always uses 8.3, so for 8.4 run `php <8.4 dir>/composer/composer.phar`), Docker. No .NET SDK.
   Cannot run macOS builds locally — macOS is verified by CI only. Android SDK (with emulator) in
   `%LOCALAPPDATA%\Android\Sdk`; JDK 21 at `C:\Program Files\Java\jdk-21.0.11` (`JAVA_HOME` points at
-  Android Studio's JDK 25 JBR, which older Gradle can't run on).
+  Android Studio's JDK 25 JBR, which older Gradle can't run on). No Python: `python3` is the
+  Windows Store stub and hangs the shell until timeout. Use Node for scripts.
 
 ## Board (Personal Apps card table)
 
@@ -333,6 +334,9 @@ Don't pass `-v` to the `dir` scan — it prints secrets from local `.env` files 
 `pages.yml` run, check `curl -sI` `Last-Modified` (it should be after the deploy time) or retry for
 ~10 minutes before deciding the rebuild failed. Two deploys a few minutes apart can fail with "in
 progress deployment. Please cancel … first". That's harmless if the earlier deploy has the new release.
+
+**Card ids.** Cards and comments share one id sequence, so you can't predict a new card's number.
+Create the card first, then mention its id in other comments.
 
 **Card ordering note.** An L card that's been split stays in Ready *on hold* as the tracker. It is
 not picked up by the build step, and it moves to Done once all its pieces are released.
