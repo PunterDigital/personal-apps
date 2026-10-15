@@ -259,6 +259,12 @@ For each card in Triage:
   the top of `playwright.config.js` — workers re-load the config after the server has migrated.
   A stale `public/hot` makes pages load from a dead Vite dev server (blank page): delete it.
 - `pint` isn't always idempotent; run `pint --test` after `pint`.
+- A `composer update` can bump Pint (its constraint is loose) and bring new rules. `pint` then
+  turns fully-qualified names into imports, and in `tests/Pest.php` it puts the `use` lines below
+  the `pest()->extend(TestCase::class)` calls that need them ("The class `TestCase` was not
+  found"). Move the imports to the top of the file and rerun Pest.
+- Playwright E2E via `php artisan serve` with `CACHE_STORE=array` can't exercise rate limits: every
+  request is a fresh PHP process, so the cache is always empty. Cover throttles in Pest.
 - Composer 2.9 refuses to resolve any package version with a known advisory (`block-insecure`).
   Every Laravel 11.x is affected (fixes only in 12+), so `composer update` fails outright. Use
   `COMPOSER_NO_SECURITY_BLOCKING=1` for an in-range update and card the major upgrade.
