@@ -217,6 +217,13 @@ For each card in Triage:
   reset it. Apps that auto-lock on system idle need an E2E env hook to turn that off.
 - E2E clicks: click a specific spot, not the element centre, when the element contains nested
   buttons (e.g. breadcrumbs). CI runners have different home paths and window sizes.
+- Chromium switches passed to `electron.launch` args (`--disable-webgl`, `--disable-3d-apis`) don't
+  reach the renderer. To read xterm.js output in E2E, hide WebGL2 with
+  `app.context().addInitScript` (patch `getContext('webgl2')` → null) and `page.reload()`, so xterm
+  falls back to its DOM renderer and `.xterm-rows` holds the text (Nexus `ssh-session.spec.ts`).
+- Keep native-module loaders (e.g. a SQLCipher DB layer) out of the static import graph of modules
+  that unit tests import: the ubuntu CI job may not be able to load the binary (SQLCipher's
+  prebuilt needs libcrypto 1.1). Use a lazy `await import()` at the call site.
 
 **Tauri 2 (Rust + system webview)**
 - E2E: Playwright can't launch Tauri, but WebView2 speaks CDP. Mark the window `create: false` and build
