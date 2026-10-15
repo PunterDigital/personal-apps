@@ -222,6 +222,13 @@ For each card in Triage:
   reach the renderer. To read xterm.js output in E2E, hide WebGL2 with
   `app.context().addInitScript` (patch `getContext('webgl2')` → null) and `page.reload()`, so xterm
   falls back to its DOM renderer and `.xterm-rows` holds the text (Nexus `ssh-session.spec.ts`).
+- esbuild-bundled main process: load an *external* CJS package lazily with `require()`, not
+  `await import()`. esbuild's ESM interop wrapper lost electron-updater's `autoUpdater` getter
+  (undefined only in the packaged app). Test such paths on a packaged build (Nexus `src/main/updater`).
+- Auto-update can be tested for real without touching Shay's install: package with
+  `-c.extraMetadata.version=<older>` and run it with a test profile plus the app's opt-in env
+  (Nexus: `NEXUS_UPDATE_IN_TEST_PROFILE=1`). It downloads the current release. Never click
+  "Restart to update", and delete `%LOCALAPPDATA%/<app>-updater` afterwards.
 - Keep native-module loaders (e.g. a SQLCipher DB layer) out of the static import graph of modules
   that unit tests import: the ubuntu CI job may not be able to load the binary (SQLCipher's
   prebuilt needs libcrypto 1.1). Use a lazy `await import()` at the call site.
