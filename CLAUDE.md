@@ -326,6 +326,10 @@ For each card in Triage:
 get the tab ready for input" on clicks). `read_page`, `find`, `form_input`, `get_page_text` and
 `javascript_tool` still work: fill fields with `form_input` and submit with
 `form.requestSubmit()` or a button `.click()` in `javascript_tool`.
+`preview_start` by `name` only reads the session folder's `.claude/launch.json` (this control
+repo, which has none), not the project's. Start the project's server with Bash
+(`run_in_background`, throwaway DB, spare port), open it with `preview_start({url})`, and stop
+it by port afterwards (`Get-NetTCPConnection -LocalPort <n>` → `Stop-Process`).
 
 **Updating a PR branch after another PR merged.** Don't force-push a rebase. Rebase locally and test,
 then push a merge commit with that exact tree on top of the remote branch:
