@@ -343,6 +343,15 @@ docker run --rm -i --network groundstation_default node:24-bookworm-slim sh -c '
 xf - -C /app && cd /app && npm ci --ignore-scripts && DB_DRIVER=mysql DB_HOST=mysql DB_PORT=3306
 DB_USER=root DB_PASSWORD=root node tests/run.js <files>'`. Baseline against `git archive main` the
 same way. `docker compose stop` afterwards.
+Treat ports published on `0.0.0.0` as reachable from outside this PC: a ransom bot wiped
+GroundStation's root/root MySQL container on 3307 (Oct 2026, card #2635). Dev compose files
+publish on `127.0.0.1` only, and nothing needs the published port anyway (see above). If a
+DB container shows a `RECOVER_YOUR_DATA`-style database or stripped grants, stop it, look
+before deleting anything, and flag it to Shay.
+GitHub Actions on the self-hosted runner: a job `container:` breaks every JS action
+(`/__e/node24/bin/node: no such file`). Check out on the runner and pipe the tree into
+`docker run --network ${{ job.services.<id>.network }}` instead (GroundStation `ci.yml`);
+`--tmpfs /var/lib/mysql` in the service options makes the MySQL suite ~5x faster.
 
 **Downloads page redeploys.** GitHub Pages' CDN caches the page for up to 10 minutes
 (`Cache-Control: max-age=600`), and a `?t=` query string does not get past it. After a successful
@@ -372,6 +381,8 @@ Shay approves from an interactive session in this folder, which then updates `.c
 
 - Never force-push, delete repos, delete releases, or rewrite published history without Shay's OK.
 - Never commit secrets. Never put credentials in GroundStation comments.
+- Dev containers (compose files, `docker run -p`) publish ports on `127.0.0.1` only, never
+  `0.0.0.0`: this PC is reachable over IPv6 (Shay, #2635). Fix any managed project that doesn't.
 - Never mark something done that wasn't verified. If E2E couldn't be done, say so on the card.
 - Keep comments short and useful; one comment per state change.
 - If this playbook is wrong or incomplete, fix it in the same run and mention it in the run log.
