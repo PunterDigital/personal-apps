@@ -253,6 +253,12 @@ For each card in Triage:
   just the web link. Releases are still tagged and published in the repo.
 - `gh api .../actions/runners` needs `admin:org`, which the gh token lacks: the runner's health
   is only visible through whether jobs get picked up.
+- The self-hosted runner runs one job at a time. Turning on Dependabot opens a burst of PRs whose
+  CI fills the queue, so a release tag pushed right after onboarding can wait 10+ minutes. Push
+  the tag before enabling Dependabot, or expect the wait.
+- **GroundStation** (`groundstation/`) is the app this board and the GroundStation MCP connector
+  run on. A merge to its `main` redeploys the pipeline's own board, so after every merge check
+  the live site *and* that an MCP call still answers before carrying on with the run.
 
 **Laravel web apps (Forge-hosted)**
 - No desktop builds: CI is one ubuntu job (Pint, `npm run build`, Pest, Playwright E2E). Forge

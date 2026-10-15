@@ -97,6 +97,20 @@
       "webUrl": "https://mcpacks.dev/",
       "private": true,
       "status": "active"
+    },
+    {
+      "name": "GroundStation",
+      "slug": "groundstation",
+      "folder": "groundstation",
+      "repo": "PunterDigital/groundstation",
+      "tag": "groundstation",
+      "description": "Basecamp-style project management: message boards, to-dos, schedules, docs, chat, card tables, hill charts, check-ins and scorecards, with an MCP server so AI assistants can work alongside your team.",
+      "platforms": [
+        "web"
+      ],
+      "webUrl": "https://app.groundstationhq.com/",
+      "private": true,
+      "status": "active"
     }
   ]
 }
