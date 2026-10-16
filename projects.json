@@ -111,6 +111,19 @@
       "webUrl": "https://app.groundstationhq.com/",
       "private": true,
       "status": "active"
+    },
+    {
+      "name": "Clerq",
+      "slug": "clerq",
+      "folder": "clerq",
+      "repo": "PunterDigital/clerq",
+      "tag": "clerq",
+      "description": "An open-source, self-hostable business OS for developer-freelancers and small dev studios: clients, projects, time tracking, expenses and invoicing in one connected flow.",
+      "platforms": [
+        "web"
+      ],
+      "webUrl": "https://app.useclerq.net/",
+      "status": "active"
     }
   ]
 }
