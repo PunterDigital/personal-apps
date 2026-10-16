@@ -210,6 +210,10 @@ For each card in Triage:
   "Expected all non-binary files to have identical SHAs ... CodeResources".
 - Run the E2E suite against the packaged app in CI, not just the dev build.
 - `main` is branch-protected with required checks, so version bumps go through a PR too.
+- Required checks match the job *name*. Renaming a job (e.g. "E2E (emulator, API 34)" → "API 36")
+  leaves the old name required, and every PR is blocked. Keep versions out of required job names.
+  If one has to change, updating the protection's `contexts` is a repo-settings change: say so in
+  the run log (World Explorer #2428).
 - Switching between branches with different Electron majors: `pnpm install` relinks, but Electron's own
   `install.js` (old `extract-zip`) can silently extract only one file under Node 24, leaving
   "Electron failed to install correctly". Fix: expand the cached zip from `%LOCALAPPDATA%\electron\Cache`
