@@ -344,6 +344,11 @@ For each card in Triage:
   `disk.dataPartition.path = <temp>` and `fastboot.*` lines, and boot it with `ANDROID_AVD_HOME`
   pointing there (write the `.ini` `path=` with forward slashes). After `pm grant`, wait ~30 s and
   `adb shell sync` before `adb reboot`, or the grants are lost. Don't touch the managed AVD itself.
+- Checking dialog order by hand: `uiautomator dump` shows only the top window, so a dialog
+  stacked underneath stays hidden. List every window with
+  `adb shell dumpsys window windows | grep "Window #"`. Change `font_scale` during a prompt
+  to test activity recreation (a duplicate permission request logs "Can request only one set
+  of permissions at a time").
 - Git Bash: turn `$LOCALAPPDATA` into a POSIX path with `cygpath -u` before adding it to `PATH`, and
   set `MSYS_NO_PATHCONV=1` for `adb shell` commands with `/sdcard/...` paths.
 
