@@ -283,10 +283,11 @@ For each card in Triage:
 
 **Docker-image web apps (Clerq)**
 - Release on a `v*` tag: build + push the GHCR image, POST the repo's `DEPLOY_WEBHOOK_URL`
-  secret to redeploy production, then `gh release create --generate-notes`. No release assets.
+  secret (Easypanel deploy webhook; the service tracks the `latest` tag) to redeploy production, then `gh release create --generate-notes`. No release assets.
 - Verify a deploy with `curl https://app.useclerq.net/version` (`{"version":"x.y.z"}`); the
   release's deploy job waits up to 15 min for it to match the tag. Don't trust the webhook's 2xx
-  or the HTML: a no-code-change release rebuilds byte-identical Next.js chunks.
+  or the HTML: a no-code-change release rebuilds byte-identical Next.js chunks. If it never
+  rolls over, check Easypanel isn't pinned to a fixed image tag (it was until v1.4.0).
 - Postgres-backed E2E on this machine: published ports don't reach the host, so run migrate,
   seed, build and Playwright inside `mcr.microsoft.com/playwright:v<version>-noble` on a Docker
   network with the DB (recipe in Clerq's local `CLAUDE.md`).
