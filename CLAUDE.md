@@ -218,6 +218,11 @@ For each card in Triage:
   reset it. Apps that auto-lock on system idle need an E2E env hook to turn that off.
 - E2E clicks: click a specific spot, not the element centre, when the element contains nested
   buttons (e.g. breadcrumbs). CI runners have different home paths and window sizes.
+- Layout E2E: test the minimum window with a real `BrowserWindow.setSize()` (the OS enforces
+  `minWidth`), and large sizes (4K) with `page.setViewportSize()`, since a real window can't
+  outgrow a CI runner's screen. Viewport emulation can't be switched off again, so do it last in a
+  test or after a relaunch. `main.scrollWidth` misses controls clipped by a nested
+  `overflow-hidden` box: also compare each control's rect with the container's (Nexus `app-shell.spec.ts`).
 - Chromium switches passed to `electron.launch` args (`--disable-webgl`, `--disable-3d-apis`) don't
   reach the renderer. To read xterm.js output in E2E, hide WebGL2 with
   `app.context().addInitScript` (patch `getContext('webgl2')` → null) and `page.reload()`, so xterm
