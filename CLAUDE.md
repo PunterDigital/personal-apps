@@ -350,6 +350,11 @@ one folder per card) and embed `https://raw.githubusercontent.com/<repo>/pr-asse
 `main` stays image-free. Capture with a temporary Playwright spec that is never committed, and point
 any file browser at a temp dir, never Shay's home folder.
 
+**Parallel branches in one repo.** While subagents edit the main checkout, a second card can go in a
+`git worktree add` under the scratchpad (never a top-level folder here: the next run would onboard it),
+with its own `pnpm install`. `git worktree remove` fails on Windows with "Filename too long" in
+`node_modules`: delete the folder with `cmd /c rmdir /s /q "\\?\<path>"`, then `git worktree prune`.
+
 **Stacking a branch on an open PR.** `gh pr merge --squash --delete-branch` also deletes the local
 branch, so `git rebase --onto main <old-branch>` fails afterwards. A squash keeps the same tree,
 so commit the stacked work, then `git reset --soft main` and commit again: the index holds only
