@@ -156,6 +156,10 @@ For each card in Triage:
    - **Check the folder is its own repo:** `git -C <folder> rev-parse --show-toplevel` must print the
      folder itself. If it prints the control-repo root, the folder has no `.git` and every git command
      would hit the control repo — run `git init -b main` in the folder first.
+   - Shay may name a project that has no folder yet: find it with `gh repo list PunterDigital`
+     (and `ShayPunter`) and `git clone` it into a top-level folder of that name.
+   - Check every workflow's `runs-on`: the org's self-hosted runner group accepts public repos
+     (Clerq's CI ran on it), so a public repo can arrive using it. Move it to GitHub-hosted.
    - Copied-in `node_modules` are usually broken (pnpm symlinks don't survive copies): delete and
      reinstall from the lockfile before judging whether the project builds.
    - Run the project's own build/typecheck/lint/tests first and record what's broken — that's the
@@ -276,6 +280,16 @@ For each card in Triage:
 - **GroundStation** (`groundstation/`) is the app this board and the GroundStation MCP connector
   run on. A merge to its `main` redeploys the pipeline's own board, so after every merge check
   the live site *and* that an MCP call still answers before carrying on with the run.
+
+**Docker-image web apps (Clerq)**
+- Release on a `v*` tag: build + push the GHCR image, POST the repo's `DEPLOY_WEBHOOK_URL`
+  secret to redeploy production, then `gh release create --generate-notes`. No release assets.
+- A release with no app-code change rebuilds byte-identical Next.js chunks, so the live HTML
+  can't confirm the deploy rolled over; only a change to the app shows up in the chunk hashes.
+- Postgres-backed E2E on this machine: published ports don't reach the host, so run migrate,
+  seed, build and Playwright inside `mcr.microsoft.com/playwright:v<version>-noble` on a Docker
+  network with the DB (recipe in Clerq's local `CLAUDE.md`).
+- Clerq gitignores `CLAUDE.md`/`.claude/` on purpose: its project notes stay local, uncommitted.
 
 **Laravel web apps (Forge-hosted)**
 - No desktop builds: CI is one ubuntu job (Pint, `npm run build`, Pest, Playwright E2E). Forge
