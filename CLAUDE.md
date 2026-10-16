@@ -261,6 +261,9 @@ For each card in Triage:
   build the frontend first.
 - A copied-in `src-tauri/target` from another path fails with "failed to read plugin permissions …
   app_hide.toml": delete it, the same as copied `node_modules`.
+- `app.security.csp` only applies to bundled assets: `tauri dev` (and a debug binary on the Vite
+  devUrl) runs with no CSP at all. Check CSP changes on a release binary, with an E2E fixture that
+  fails on console errors after a reload (ProjectTrucks `e2e/fixtures.ts`).
 - Release: create the GitHub Release (`gh release create --generate-notes`) in a first job, then
   `tauri-action` with the same `tagName` uploads to it from each OS. Finish with an asset-check job.
 
