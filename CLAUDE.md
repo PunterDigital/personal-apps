@@ -223,6 +223,10 @@ For each card in Triage:
   outgrow a CI runner's screen. Viewport emulation can't be switched off again, so do it last in a
   test or after a relaunch. `main.scrollWidth` misses controls clipped by a nested
   `overflow-hidden` box: also compare each control's rect with the container's (Nexus `app-shell.spec.ts`).
+- Parallel Playwright workers share the OS clipboard. A spec that asserts the clipboard gets cleared
+  (Nexus `security-settings.spec.ts`) fails when another spec copies at the same time. Specs that
+  only check *what* a button copies should record `navigator.clipboard.writeText` in the page
+  instead (Nexus `keychain.spec.ts`).
 - Chromium switches passed to `electron.launch` args (`--disable-webgl`, `--disable-3d-apis`) don't
   reach the renderer. To read xterm.js output in E2E, hide WebGL2 with
   `app.context().addInitScript` (patch `getContext('webgl2')` → null) and `page.reload()`, so xterm
