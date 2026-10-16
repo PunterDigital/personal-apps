@@ -335,6 +335,17 @@ it by port afterwards (`Get-NetTCPConnection -LocalPort <n>` → `Stop-Process`)
 then push a merge commit with that exact tree on top of the remote branch:
 `git commit-tree $(git rev-parse HEAD^{tree}) -p origin/<branch> -p main`.
 
+**Screenshots in PRs.** `gh` can't upload images. Commit them to an orphan `pr-assets` branch in the
+app repo (`git hash-object -w` → `git mktree` → `git commit-tree` → `git push origin <sha>:refs/heads/pr-assets`,
+one folder per card) and embed `https://raw.githubusercontent.com/<repo>/pr-assets/<card>/<file>.png`.
+`main` stays image-free. Capture with a temporary Playwright spec that is never committed, and point
+any file browser at a temp dir, never Shay's home folder.
+
+**Stacking a branch on an open PR.** `gh pr merge --squash --delete-branch` also deletes the local
+branch, so `git rebase --onto main <old-branch>` fails afterwards. A squash keeps the same tree,
+so commit the stacked work, then `git reset --soft main` and commit again: the index holds only
+the stacked changes.
+
 **Secret scanning.** gitleaks via Docker. Bind-mounting `E:\` paths fails in this Docker setup, so
 pipe the repo in:
 `tar --exclude=./node_modules --exclude=./vendor -cf - . | docker run --rm -i --entrypoint sh zricethezav/gitleaks:v8.21.2 -c 'mkdir /repo && tar xf - -C /repo && git config --global --add safe.directory /repo && gitleaks git /repo --no-banner && gitleaks dir /repo --no-banner'`.
