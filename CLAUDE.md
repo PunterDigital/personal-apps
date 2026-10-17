@@ -246,6 +246,11 @@ For each card in Triage:
   `-c.extraMetadata.version=<older>` and run it with a test profile plus the app's opt-in env
   (Nexus: `NEXUS_UPDATE_IN_TEST_PROFILE=1`). It downloads the current release. Never click
   "Restart to update", and delete `%LOCALAPPDATA%/<app>-updater` afterwards.
+- An uncaught exception in the main process pops a native "A JavaScript error occurred" dialog on
+  Shay's screen, even during E2E. Express's `res.download` callback runs while Windows still has the
+  file open, so deleting it there throws (ENOTEMPTY). Send a Buffer, or clean up later (Finance #2719).
+- Playwright doesn't fire `download` events for Electron: set the save path in a `will-download`
+  handler via `app.evaluate` (Finance `settings.spec.ts`).
 - Keep native-module loaders (e.g. a SQLCipher DB layer) out of the static import graph of modules
   that unit tests import: the ubuntu CI job may not be able to load the binary (SQLCipher's
   prebuilt needs libcrypto 1.1). Use a lazy `await import()` at the call site.
