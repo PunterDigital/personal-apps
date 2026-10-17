@@ -54,15 +54,13 @@
       "folder": "project-trucks",
       "repo": "PunterDigital/project-trucks",
       "tag": "project trucks",
-      "description": "A local Euro Truck Simulator 2 delivery tracker: log every job and kilometre to a private SQLite database on your own machine. Telemetry auto-capture is Windows-only.",
+      "description": "A local Euro Truck Simulator 2 delivery tracker for Windows: log every job and kilometre to a private SQLite database on your own machine.",
       "platforms": [
-        "windows",
-        "macos"
+        "windows"
       ],
       "webUrl": null,
       "assets": {
-        "windows": "_x64-setup.exe$",
-        "macos": "_universal.dmg$"
+        "windows": "_x64-setup.exe$"
       },
       "status": "active"
     },
