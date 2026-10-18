@@ -409,6 +409,10 @@ app repo (`git hash-object -w` → `git mktree` → `git commit-tree` → `git p
 one folder per card) and embed `https://raw.githubusercontent.com/<repo>/pr-assets/<card>/<file>.png`.
 `main` stays image-free. Capture with a temporary Playwright spec that is never committed, and point
 any file browser at a temp dir, never Shay's home folder.
+Guard the script (`set -e`, `test -n "$c"`, feed `git mktree` from a file): if `git commit-tree`
+fails, `git push origin $c:refs/heads/pr-assets` becomes `:refs/heads/pr-assets` and **deletes**
+the branch (happened on nexus-ssh, restored at once from the fetched commit). Push only after
+`git merge-base --is-ancestor origin/pr-assets $c`.
 
 **Parallel branches in one repo.** While subagents edit the main checkout, a second card can go in a
 `git worktree add` under the scratchpad (never a top-level folder here: the next run would onboard it),
