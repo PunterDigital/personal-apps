@@ -58,8 +58,22 @@ source of truth for *how* work is done. Update it when the process changes.
 
 **Tags.** Project tags (lowercase, e.g. `nexus ssh`) map to `projects.json[].tag`. Status tags Claude
 manages: `claude` (Claude owns it), `needs answer` (question pending for Shay), `blocked` (Claude
-cannot proceed — reason in comments), `bug`, `hotfix` (ship immediately), `size: s|m|l`.
+cannot proceed — reason in comments), `bug`, `hotfix` (ship immediately), `size: s|m|l`,
+`priority: low|medium|high|critical`.
 Create tags on the fly with `add_card_tag` by name.
+
+**Priority.** Every triaged card carries exactly one `priority:` tag:
+
+| Tag | Meaning | Handling |
+|---|---|---|
+| `priority: critical` | App won't launch, data loss, security issue, production down | Built first, released straight after merge (as `hotfix`) |
+| `priority: high` | Core feature broken with no workaround, or Shay wants it soon | Built before any medium/low card |
+| `priority: medium` | Normal features and bugs (the default) | Normal order |
+| `priority: low` | Polish, nice-to-haves, cleanup | Only when nothing higher is in Ready |
+
+Shay's priority wins: if a card already has a `priority:` tag that Shay set, keep it. If Claude disagrees,
+say why in a comment and leave the tag alone. A Ready card with no priority tag counts as medium; add
+the tag the next time the card is touched. Only one `priority:` tag per card: remove the old one when changing it.
 
 ## Scheduled run procedure
 
@@ -87,7 +101,8 @@ Runs every 3 hours, 09:00–21:00 local. Each run:
    Read the full comment thread of any card before you build, merge or release it, and act on any
    un-prefixed comment newer than Claude's last one.
 5. **Triage.** Every card in *Triage* (see **Triage rules**).
-6. **Build.** Take the top card from *Ready* (order: `hotfix` > `bug` > due date > oldest). Run the
+6. **Build.** Take the top card from *Ready*: `hotfix` / `priority: critical` > `high` > `medium` >
+   `low`; within the same priority, `bug` > due date > oldest. Run the
    **Feature workflow**. Do up to 2 cards per run if time allows; never leave a card half-done without
    a comment saying where it stands.
 7. **Release.** Apply the **Release cadence**.
@@ -103,14 +118,15 @@ For each card in Triage:
 3. **Decide:**
    - **Ready** — the outcome is clear enough to write acceptance criteria. Comment with:
      `🤖 Claude: Triaged.` + acceptance criteria (bullets) + size (S ≤ 1 run, M ≤ 3 runs, L = split)
-     + planned approach in 1–3 lines. Tag `claude` and `size: x`.
+     + priority with a one-line reason
+     + planned approach in 1–3 lines. Tag `claude`, `size: x` and `priority: x` (see **Priority**).
    - **Needs Info** — real ambiguity that changes what gets built. Comment with numbered questions,
      each with Claude's recommended default ("If you don't mind, I'll do X"). Tag `needs answer`.
      When Claude creates a card that needs an answer, the description holds the context and the
      questions still go in a `🤖 Claude:` comment, so each card follows one pattern.
      Do not ask questions with obvious conventional answers — pick the default and note it.
    - **Not Now** — out of scope, huge, or blocked by something external. Comment the reason.
-   - **L-size** → split into S/M cards (create_card, same tags, straight into Ready), comment on the
+   - **L-size** → split into S/M cards (create_card, same tags incl. priority, straight into Ready), comment on the
      parent listing them, and move the parent to Done once all pieces are released.
 4. **Always ask first (Needs Info) before:** breaking changes to user data or config formats, deleting
    features, adding paid services/APIs, changing licence, anything touching credentials or secrets.
@@ -136,8 +152,8 @@ For each card in Triage:
 
 - **Weekly release train:** the first run on **Monday** releases every project that has cards in
   *Awaiting Release* (or other unreleased commits on `main`).
-- **Hotfix:** cards tagged `hotfix`, or `bug`s that stop the app launching / lose data / are security
-  issues → release immediately after merge.
+- **Hotfix:** cards tagged `hotfix` or `priority: critical`, or `bug`s that stop the app launching /
+  lose data / are security issues (tag those `priority: critical`) → release immediately after merge.
 - **First release:** a newly onboarded project gets a release as soon as its pipelines are green.
 - **Versioning:** semver tags `vX.Y.Z`. Pre-1.0: features → minor, fixes → patch. Breaking changes
   need Shay's OK on a card. Version files (package.json, tauri.conf.json, etc.) bumped in the release
