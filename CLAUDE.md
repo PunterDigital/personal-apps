@@ -336,6 +336,13 @@ For each card in Triage:
   change (the hash differs from a local build). A server-only change, or a deploy that finished
   before you started watching, won't move the hash: check the changed behaviour on the live site
   with `curl` instead.
+- New Laravel apps: `composer create-project laravel/vue-starter-kit <dir> --stability=dev` (Laravel 13,
+  Inertia 3, Fortify, Vite+). Its feature installer (`laravel/chisel`) fails at the final
+  `vp check --fix` ("All matched files may have been excluded by ignore rules") because Vite+
+  applies this control repo's `.gitignore` until the folder is its own repo: `git init -b main`
+  first, or rerun `npm run check:fix` after it, then delete `chisel*.php` and
+  `InstallFeaturesCommand.php` and `composer remove laravel/chisel`. Its `.gitignore` ignores
+  `CLAUDE.md`: remove that line so the project notes are committed.
 - After rebasing a branch, run `npm run build` again before E2E: a stale `public/build` from before
   the rebase makes Playwright fail on UI that is already in the code.
 

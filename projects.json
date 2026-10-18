@@ -1,5 +1,5 @@
 {
-  "$comment": "Registry of managed apps. platforms: web | windows | macos | android. assets: optional per-platform regex overrides for matching release asset filenames. private: true for a private repo (the downloads page skips the release lookup and the source link).",
+  "$comment": "Registry of managed apps. platforms: web | windows | macos | android. assets: optional per-platform regex overrides for matching release asset filenames. private: true for a private repo (the downloads page skips the release lookup and the source link). status: hidden keeps an app off the downloads page (internal tools with nothing to download).",
   "projects": [
     {
       "name": "Nexus SSH",
@@ -122,6 +122,20 @@
       ],
       "webUrl": "https://app.useclerq.net/",
       "status": "active"
+    },
+    {
+      "name": "PunterDigital Panel",
+      "slug": "punterdigital-panel",
+      "folder": "panel.punterdigital.com",
+      "repo": "PunterDigital/panel.punterdigital.com",
+      "tag": "punterdigital panel",
+      "description": "PunterDigital contractor platform: vetting, client directory, hire requests, engagements, e-signed contracts and timesheets, with invoicing through Clerq.",
+      "platforms": [
+        "web"
+      ],
+      "webUrl": null,
+      "private": true,
+      "status": "hidden"
     }
   ]
 }
