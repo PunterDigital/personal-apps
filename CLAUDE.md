@@ -463,6 +463,14 @@ not picked up by the build step, and it moves to Done once all its pieces are re
 - Review and merge green Dependabot PRs (patch/minor); majors become cards.
 - Check the last CI run on each `main` is green; investigate red.
 - `npm audit` (or equivalent) — high/critical findings become `bug` cards.
+- Dependabot runs that fail with `ERR_PNPM_NO_MATURE_MATCHING_VERSION` aren't config bugs: its release-age
+  gate refuses versions only a day or two old, which a fresh direct-dependency bump (e.g. `^44.9.0`)
+  forces. They clear by themselves (Nexus, Oct 2026).
+- Tauri apps: Dependabot's separate npm and cargo minor groups each fail `tauri build` ("mismatched
+  Tauri packages"), because `@tauri-apps/*` and the `tauri*` crates must move together. Combine both
+  branches in one PR (ProjectTrucks #2879).
+- The release train is a good fit for parallel sub-agents (one per project, release + maintenance,
+  no board writes); the parent moves cards and rebuilds the downloads page once at the end.
 
 ## Permissions
 
