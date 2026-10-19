@@ -343,6 +343,11 @@ For each card in Triage:
   found"). Move the imports to the top of the file and rerun Pest.
 - Playwright E2E via `php artisan serve` with `CACHE_STORE=array` can't exercise rate limits: every
   request is a fresh PHP process, so the cache is always empty. Cover throttles in Pest.
+  The same empty cache hides every Filament 5 toast (they wait in the cache for the page's next
+  request): Filament E2E needs `CACHE_STORE=database` on the throwaway SQLite (Panel #2914).
+- Filament ignores a call to a mounted action that has become `disabled()` since its modal
+  opened: the modal stays open and nothing is said. Keep `disabled()` to the button and let the
+  action class refuse (Panel `RoleResource::isOpen()`).
 - Composer 2.9 refuses to resolve any package version with a known advisory (`block-insecure`).
   Every Laravel 11.x is affected (fixes only in 12+), so `composer update` fails outright. Use
   `COMPOSER_NO_SECURITY_BLOCKING=1` for an in-range update and card the major upgrade.
