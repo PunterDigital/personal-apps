@@ -454,6 +454,7 @@ progress deployment. Please cancel … first". That's harmless if the earlier de
 
 **Card ids.** Cards and comments share one id sequence, so you can't predict a new card's number.
 Create the card first, then mention its id in other comments.
+Comments are sanitized HTML: an angle-bracket placeholder like `<email>` disappears, even inside backticks. Write a concrete example (`you@example.com`) or `&lt;email&gt;`.
 
 **Card ordering note.** An L card that's been split stays in Ready *on hold* as the tracker. It is
 not picked up by the build step, and it moves to Done once all its pieces are released.
