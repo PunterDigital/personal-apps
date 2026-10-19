@@ -414,6 +414,11 @@ fails, `git push origin $c:refs/heads/pr-assets` becomes `:refs/heads/pr-assets`
 the branch (happened on nexus-ssh, restored at once from the fetched commit). Push only after
 `git merge-base --is-ancestor origin/pr-assets $c`.
 
+**Editing PHP from the shell.** `sed` replacement strings and heredocs fed to `node -e` / `node -`
+lose the `\` in PHP namespaces: the replace silently matches nothing, or writes `AppRbacAccess`
+for `App\Rbac\Access`. Edit PHP with the Edit/Write tools (or a quoted `cat <<'EOF'` heredoc that
+writes the whole file). Happened in three runs on Oct 19.
+
 **Parallel branches in one repo.** While subagents edit the main checkout, a second card can go in a
 `git worktree add` under the scratchpad (never a top-level folder here: the next run would onboard it),
 with its own `pnpm install`. `git worktree remove` fails on Windows with "Filename too long" in
