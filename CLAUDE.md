@@ -431,6 +431,9 @@ The same goes for anything with a backslash in a `node -e '…'` script: regexes
 (`/\/staff$/` became `//staff$/`, a comment, and a `.replace` matched nothing), and a
 zero-width space slipped into a class name once. Use Edit for those too, then `grep` for the
 change and for non-ASCII (`grep -nP '[^\x00-\x7F]'`).
+Even a quoted `cat <<'EOF'` heredoc isn't byte-exact here: single `\` survive, but `\\` arrives
+as `\` (checked with `od -c`). So a heredoc-written PHP file is fine, while a JS/TS helper script
+that escapes backslashes (`'App\\Models'`) silently loses them (Panel #2788).
 
 **Parallel branches in one repo.** While subagents edit the main checkout, a second card can go in a
 `git worktree add` under the scratchpad (never a top-level folder here: the next run would onboard it),
