@@ -395,6 +395,10 @@ For each card in Triage:
 get the tab ready for input" on clicks). `read_page`, `find`, `form_input`, `get_page_text` and
 `javascript_tool` still work: fill fields with `form_input` and submit with
 `form.requestSubmit()` or a button `.click()` in `javascript_tool`.
+Inertia apps (Laravel starter kits) are the exception: after an XHR submit (2FA challenge,
+login into a Filament panel) the undrawn pane never follows the redirect. Drive those flows
+with a throwaway Playwright spec instead (headless Chromium, screenshots to the scratchpad),
+never committed (Panel #2787).
 `preview_start` by `name` only reads the session folder's `.claude/launch.json` (this control
 repo, which has none), not the project's. Start the project's server with Bash
 (`run_in_background`, throwaway DB, spare port), open it with `preview_start({url})`, and stop
