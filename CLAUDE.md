@@ -352,6 +352,10 @@ For each card in Triage:
   Livewire property), not the re-fetched record (Panel `ViewApplication::$shownStatus`).
 - Filament in Playwright: list-page tabs are `button`s, not `tab`s, and relation managers load
   lazily ("Loading...") until scrolled into view (`scrollIntoViewIfNeeded()`).
+- A Filament `Select::options(SomeEnum::class)` gives the action the enum instance, not its
+  value: `SomeEnum::from($data['x'])` is a TypeError (500) only in the browser, since tests that
+  pass plain strings skip the cast. Accept both in the action, and test the form through
+  `callAction` with the real field (Panel #2796).
 - Composer 2.9 refuses to resolve any package version with a known advisory (`block-insecure`).
   Every Laravel 11.x is affected (fixes only in 12+), so `composer update` fails outright. Use
   `COMPOSER_NO_SECURITY_BLOCKING=1` for an in-range update and card the major upgrade.
