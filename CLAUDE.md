@@ -380,6 +380,9 @@ For each card in Triage:
   the production migration half way: tables left, migration unrecorded, every later deploy
   fails "already exists", and the new routes stay 404. Name long indexes explicitly; Panel's
   `tests/Feature/Database/IdentifierLengthTest.php` checks every name (Panel #2793).
+- Vue + Inertia `<Form>` with a native `<select :value="…">`: Vue sets the value before the
+  `<option>`s exist, so the first option shows and is what gets submitted next time. Put
+  `:selected` on the options instead, and have E2E check the saved value after the reload (Panel #2797).
 - After rebasing a branch, run `npm run build` again before E2E: a stale `public/build` from before
   the rebase makes Playwright fail on UI that is already in the code.
 
