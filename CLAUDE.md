@@ -446,6 +446,9 @@ change and for non-ASCII (`grep -nP '[^\x00-\x7F]'`).
 Even a quoted `cat <<'EOF'` heredoc isn't byte-exact here: single `\` survive, but `\\` arrives
 as `\` (checked with `od -c`). So a heredoc-written PHP file is fine, while a JS/TS helper script
 that escapes backslashes (`'App\\Models'`) silently loses them (Panel #2788).
+For a multi-replace edit script, write the `.mjs` with the Write tool into the scratchpad and run
+it with `node <path>`: Write keeps every byte. Give it a `rep(a, b)` that throws when `a` isn't
+found, so a mangled pattern stops the script before it writes anything (Panel #2795).
 
 **Parallel branches in one repo.** While subagents edit the main checkout, a second card can go in a
 `git worktree add` under the scratchpad (never a top-level folder here: the next run would onboard it),
