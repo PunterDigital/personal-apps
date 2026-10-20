@@ -371,6 +371,11 @@ For each card in Triage:
   first, or rerun `npm run check:fix` after it, then delete `chisel*.php` and
   `InstallFeaturesCommand.php` and `composer remove laravel/chisel`. Its `.gitignore` ignores
   `CLAUDE.md`: remove that line so the project notes are committed.
+- SQLite (PHPUnit, E2E) accepts index names of any length; MySQL refuses over 64 characters
+  (Postgres cuts at 63). A generated `<table>_<cols>_index` over the limit passes CI and stops
+  the production migration half way: tables left, migration unrecorded, every later deploy
+  fails "already exists", and the new routes stay 404. Name long indexes explicitly; Panel's
+  `tests/Feature/Database/IdentifierLengthTest.php` checks every name (Panel #2793).
 - After rebasing a branch, run `npm run build` again before E2E: a stale `public/build` from before
   the rebase makes Playwright fail on UI that is already in the code.
 
