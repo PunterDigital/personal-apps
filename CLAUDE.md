@@ -347,12 +347,19 @@ For each card in Triage:
   request): Filament E2E needs `CACHE_STORE=database` on the throwaway SQLite (Panel #2914).
 - Filament ignores a call to a mounted action that has become `disabled()` since its modal
   opened: the modal stays open and nothing is said. Keep `disabled()` to the button and let the
-  action class refuse (Panel `RoleResource::isOpen()`).
+  action class refuse (Panel `RoleResource::isOpen()`). The same goes for `visible()`: a button
+  that depends on the record's status should follow the status the page loaded with (a public
+  Livewire property), not the re-fetched record (Panel `ViewApplication::$shownStatus`).
+- Filament in Playwright: list-page tabs are `button`s, not `tab`s, and relation managers load
+  lazily ("Loading...") until scrolled into view (`scrollIntoViewIfNeeded()`).
 - Composer 2.9 refuses to resolve any package version with a known advisory (`block-insecure`).
   Every Laravel 11.x is affected (fixes only in 12+), so `composer update` fails outright. Use
   `COMPOSER_NO_SECURITY_BLOCKING=1` for an in-range update and card the major upgrade.
 - Breeze shares `auth.user` (the full model) with every Inertia page. Leak checks on public pages
   must run as a guest (fresh Playwright context), or they flag the viewer's own email.
+  The model goes out **with any relation a controller loaded on it** (`$request->user()->application`
+  sent the whole row, staff-only columns included). Share `$request->user()?->withoutRelations()`
+  and test that `auth.user.<relation>` is missing (Panel #2792).
 - Forge deploys can be confirmed by watching the `build/assets/app-*.js` hash on the live homepage
   change (the hash differs from a local build). A server-only change, or a deploy that finished
   before you started watching, won't move the hash: check the changed behaviour on the live site
