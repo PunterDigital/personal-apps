@@ -416,8 +416,10 @@ For each card in Triage:
   from a scratch worktree of `main` (MDG #2881).
 - A frontend toolchain major can stop Forge deploys while the site stays up: the push webhook
   answers 200, the server's asset build fails (Vite 8 needs Node 20.19+), and the old
-  `public/build` keeps serving. Always confirm the asset hash changed; if it hasn't after
-  ~5 minutes, flag it to Shay (no Forge log access from here) (MDG #2881).
+  `public/build` keeps serving. Always confirm the asset hash changed, but give a toolchain
+  major time: MDG's first Vite 8 / Tailwind 4 deploy took 14 minutes to appear (the run
+  flagged it as failed at 12). Check again next run (or `curl` the CSS for `tailwindcss v4`)
+  before flagging it to Shay (no Forge log access from here) (MDG #2881).
 - After rebasing a branch, run `npm run build` again before E2E: a stale `public/build` from before
   the rebase makes Playwright fail on UI that is already in the code.
 
