@@ -295,6 +295,9 @@ For each card in Triage:
   fails on console errors after a reload (ProjectTrucks `e2e/fixtures.ts`).
 - Release: create the GitHub Release (`gh release create --generate-notes`) in a first job, then
   `tauri-action` with the same `tagName` uploads to it from each OS. Finish with an asset-check job.
+  tauri-action v1 updates the name and body of an existing release from its inputs (empty body =
+  notes wiped): export the generated notes as a job output and pass them as `releaseBody`
+  (ProjectTrucks `release.yml`).
 
 **Private repos (free plan)**
 - No branch protection or rulesets (needs GitHub Pro): there are no required checks, so confirm CI
@@ -429,6 +432,9 @@ For each card in Triage:
   `package-lock.json` and reinstall. `vp migrate` switches the project to pnpm (reverted). Vite+
   1.x also needs vue-tsc 3.2/3.3: 3.3.12–3.3.13 break `types:check` on any `https://` in a
   template attribute (vuejs/language-tools#6240), so Panel pins 3.3.11 (Panel #2801).
+- E2E that build "today" with JS local getters (`getDate()`) disagree with a UTC server
+  between 00:00 and 01:00 BST (the local date is a day ahead): use the UTC getters, or
+  read the date the page shows (Panel `self-service.spec.ts`, #2882).
 - A long parallel Playwright run on this PC can end with `net::ERR_NO_BUFFER_SPACE` console
   errors (Windows socket exhaustion, ~10 min in). Rerun the failed specs alone before blaming
   the change (Panel #2801: 42/44, then 4/4).
