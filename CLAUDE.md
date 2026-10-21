@@ -422,6 +422,16 @@ For each card in Triage:
   before flagging it to Shay (no Forge log access from here) (MDG #2881).
 - After rebasing a branch, run `npm run build` again before E2E: a stale `public/build` from before
   the rebase makes Playwright fail on UI that is already in the code.
+- Vite+ (`vite-plus`, the starter kits' toolchain) ≥ 0.3.3 needs `vite` aliased to
+  `npm:@voidzero-dev/vite-plus-core@<same version>` (plus an `overrides.vite` for the plugins'
+  peers). Upgrading it with npm: the old lock keeps `vite@8` on top and npm fails with a
+  misleading `@vue/language-core` peer conflict; delete the toolchain entries from
+  `package-lock.json` and reinstall. `vp migrate` switches the project to pnpm (reverted). Vite+
+  1.x also needs vue-tsc 3.2/3.3: 3.3.12–3.3.13 break `types:check` on any `https://` in a
+  template attribute (vuejs/language-tools#6240), so Panel pins 3.3.11 (Panel #2801).
+- A long parallel Playwright run on this PC can end with `net::ERR_NO_BUFFER_SPACE` console
+  errors (Windows socket exhaustion, ~10 min in). Rerun the failed specs alone before blaming
+  the change (Panel #2801: 42/44, then 4/4).
 
 **Android (Kotlin + Gradle)**
 - Set `JAVA_HOME` to JDK 21 before `./gradlew`: Gradle < 9 dies on JDK 25 with a bare "25.0.2" error.
