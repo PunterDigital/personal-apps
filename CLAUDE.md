@@ -390,6 +390,18 @@ For each card in Triage:
   suite runs: unrelated specs time out (Panel #2798, two specs failed, then 42/42 on a quiet rerun).
 - PDFs on Forge: spatie/laravel-pdf v2 with its DOMPDF driver needs no Chrome on the server
   (Panel `config/laravel-pdf.php`). DOMPDF has no total-pages CSS counter.
+- Laravel 13's CSRF middleware is `PreventRequestForgery`, not `ValidateCsrfToken`:
+  `->withoutMiddleware(ValidateCsrfToken::class)` on a webhook route does nothing (419). Exclude
+  the path with `$middleware->preventRequestForgery(except: [...])` in `bootstrap/app.php`. PHPUnit
+  skips CSRF, so only E2E (or a real caller) catches it (Panel #2799).
+- Documenso (self-hosted e-signature, Panel `App\Signing`): complete a contract only on
+  `DOCUMENT_COMPLETED`. The last signer's `DOCUMENT_SIGNED` already shows everyone signed, but the
+  PDF is sealed after it, and `download?version=signed` returns the original until then. It
+  refuses webhooks to private addresses unless `NEXT_PRIVATE_WEBHOOK_SSRF_BYPASS_HOSTS` lists the
+  host. A real local check works without published ports: Postgres + Mailpit + Documenso on a
+  Docker network, the cert `.p12` copied in with `docker cp`, the UI driven by a throwaway
+  Playwright script in `mcr.microsoft.com/playwright`, and the app in `php:8.4-cli` (recipe in
+  Panel's `CLAUDE.md`, Panel #2799).
 - After rebasing a branch, run `npm run build` again before E2E: a stale `public/build` from before
   the rebase makes Playwright fail on UI that is already in the code.
 
