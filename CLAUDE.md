@@ -573,5 +573,9 @@ Shay approves from an interactive session in this folder, which then updates `.c
 - Dev containers (compose files, `docker run -p`) publish ports on `127.0.0.1` only, never
   `0.0.0.0`: this PC is reachable over IPv6 (Shay, #2635). Fix any managed project that doesn't.
 - Never mark something done that wasn't verified. If E2E couldn't be done, say so on the card.
+- Never run `git checkout -- .` / `git restore .` / `git stash` "to be safe" in a project with
+  uncommitted work: it threw away a whole card's edits mid-run (GroundStation #3054; redone
+  from the scratchpad edit scripts). Keep edits as idempotent `.mjs` scripts in the scratchpad
+  until they're committed, and commit WIP before any tree-wide git command.
 - Keep comments short and useful; one comment per state change.
 - If this playbook is wrong or incomplete, fix it in the same run and mention it in the run log.
