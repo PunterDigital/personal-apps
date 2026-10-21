@@ -408,6 +408,16 @@ For each card in Triage:
 - S3-compatible checks: MinIO's Docker Hub images (`minio/minio`, `minio/mc`) are gone. Use
   `adobe/s3mock` (`COM_ADOBE_TESTING_S3MOCK_STORE_INITIAL_BUCKETS=<bucket>`, http :9090, path
   style) on a private Docker network, with the app in `php:8.4-cli` on the same network (Panel #2811).
+- Tailwind 3 → 4 (`npx @tailwindcss/upgrade`, then `@tailwindcss/vite`): the tool leaves the
+  removed `bg-opacity-*` / `ring-opacity-*` utilities in place (grep for `-opacity-[0-9]`), and
+  Breeze's `Modal.vue` panel needs `relative` or the backdrop swallows every click once the open
+  transition ends. E2E that clicks mid-transition passes anyway: wait for the panel to be fully
+  opaque first (MDG `smoke.spec.js` `settle()`). Diff before/after screenshots of every page
+  from a scratch worktree of `main` (MDG #2881).
+- A frontend toolchain major can stop Forge deploys while the site stays up: the push webhook
+  answers 200, the server's asset build fails (Vite 8 needs Node 20.19+), and the old
+  `public/build` keeps serving. Always confirm the asset hash changed; if it hasn't after
+  ~5 minutes, flag it to Shay (no Forge log access from here) (MDG #2881).
 - After rebasing a branch, run `npm run build` again before E2E: a stale `public/build` from before
   the rebase makes Playwright fail on UI that is already in the code.
 
@@ -536,8 +546,9 @@ not picked up by the build step, and it moves to Done once all its pieces are re
   gate refuses versions only a day or two old, which a fresh direct-dependency bump (e.g. `^44.9.0`)
   forces. They clear by themselves (Nexus, Oct 2026).
 - Tauri apps: Dependabot's separate npm and cargo minor groups each fail `tauri build` ("mismatched
-  Tauri packages"), because `@tauri-apps/*` and the `tauri*` crates must move together. Combine both
-  branches in one PR (ProjectTrucks #2879).
+  Tauri packages"), because `@tauri-apps/*` and the `tauri*` crates must move together. ProjectTrucks'
+  Dependabot now ignores Tauri minor/patch bumps: bump both sides by hand in one PR each Monday
+  (recipe in its `CLAUDE.md`, "Dependency updates") (ProjectTrucks #2879).
 - The release train is a good fit for parallel sub-agents (one per project, release + maintenance,
   no board writes); the parent moves cards and rebuilds the downloads page once at the end.
 
