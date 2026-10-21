@@ -402,6 +402,12 @@ For each card in Triage:
   Docker network, the cert `.p12` copied in with `docker cp`, the UI driven by a throwaway
   Playwright script in `mcr.microsoft.com/playwright`, and the app in `php:8.4-cli` (recipe in
   Panel's `CLAUDE.md`, Panel #2799).
+- `env('X', fallback)` returns `''` for an empty `X=` line, so the fallback never applies. Any
+  variable listed empty in `.env.example` (CI copies it to `.env`) needs `env('X') ?: fallback`.
+  Local runs passed and CI failed (Panel #2811).
+- S3-compatible checks: MinIO's Docker Hub images (`minio/minio`, `minio/mc`) are gone. Use
+  `adobe/s3mock` (`COM_ADOBE_TESTING_S3MOCK_STORE_INITIAL_BUCKETS=<bucket>`, http :9090, path
+  style) on a private Docker network, with the app in `php:8.4-cli` on the same network (Panel #2811).
 - After rebasing a branch, run `npm run build` again before E2E: a stale `public/build` from before
   the rebase makes Playwright fail on UI that is already in the code.
 
