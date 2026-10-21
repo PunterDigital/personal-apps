@@ -451,6 +451,12 @@ For each card in Triage:
   of permissions at a time").
 - Git Bash: turn `$LOCALAPPDATA` into a POSIX path with `cygpath -u` before adding it to `PATH`, and
   set `MSYS_NO_PATHCONV=1` for `adb shell` commands with `/sdcard/...` paths.
+- Minor-versioned platforms (Android 17 = `android-37.0`, 16 QPR = `36.1`): AGP's managed device
+  resolves `apiLevel = 37` to the `37.0` image itself, but `android-emulator-runner` interpolates
+  `api-level` verbatim into `platforms;android-X` / `system-images;android-X;…`, so the workflow
+  needs `api-level: '37.0'` **quoted**: a bare `37.0` is YAML's number 37 and `android-37` doesn't
+  exist (first CI run failed). Set `pageAlignment = FORCE_4KB_PAGES` on the managed device, or AGP
+  warns on every build that it can't tell the 37.0 image's page size (World Explorer #2711).
 
 **Built-in browser on an unattended run.** The pane may never draw (viewport 0x0, then "Could not
 get the tab ready for input" on clicks). `read_page`, `find`, `form_input`, `get_page_text` and
