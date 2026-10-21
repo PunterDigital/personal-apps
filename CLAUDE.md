@@ -383,6 +383,13 @@ For each card in Triage:
 - Vue + Inertia `<Form>` with a native `<select :value="…">`: Vue sets the value before the
   `<option>`s exist, so the first option shows and is what gets submitted next time. Put
   `:selected` on the options instead, and have E2E check the saved value after the reload (Panel #2797).
+- Filament Livewire tests: an action that calls `$action->halt()` stays mounted, so a second
+  `callAction` on the same test instance fails with "Action [x] was not found". Use
+  `assertActionMounted()` and a fresh `Livewire::test()` for the next call (Panel #2798).
+- Don't run other heavy commands (migrations, artisan, builds) while the full local Playwright
+  suite runs: unrelated specs time out (Panel #2798, two specs failed, then 42/42 on a quiet rerun).
+- PDFs on Forge: spatie/laravel-pdf v2 with its DOMPDF driver needs no Chrome on the server
+  (Panel `config/laravel-pdf.php`). DOMPDF has no total-pages CSS counter.
 - After rebasing a branch, run `npm run build` again before E2E: a stale `public/build` from before
   the rebase makes Playwright fail on UI that is already in the code.
 
