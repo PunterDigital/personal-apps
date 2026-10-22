@@ -450,6 +450,7 @@ For each card in Triage:
   first. `getByRole('checkbox', { name })` matches the whole `<label>` text, so a label with a
   description span needs an `aria-label` on the input. A `page.goto` to a 403/404 logs a Chrome
   console error: assert `collectErrors()` before such visits (Panel #3080).
+- Panel uses `data-test` attributes, not `data-testid`: Playwright `getByTestId` finds nothing, use `locator('[data-test="x"]')`. A new Bash call falls back to PHP 8.3 unless the 8.4 `PATH` export is repeated (Panel #3082).
 - A long parallel Playwright run on this PC can end with `net::ERR_NO_BUFFER_SPACE` console
   errors (Windows socket exhaustion, ~10 min in). Rerun the failed specs alone before blaming
   the change (Panel #2801: 42/44, then 4/4).
