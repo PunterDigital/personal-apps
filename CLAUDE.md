@@ -432,6 +432,16 @@ For each card in Triage:
   `package-lock.json` and reinstall. `vp migrate` switches the project to pnpm (reverted). Vite+
   1.x also needs vue-tsc 3.2/3.3: 3.3.12–3.3.13 break `types:check` on any `https://` in a
   template attribute (vuejs/language-tools#6240), so Panel pins 3.3.11 (Panel #2801).
+- A `date:Y-m-d` cast only formats on read: Eloquent still writes `Y-m-d H:i:s`, so on SQLite
+  a string `BETWEEN` / `>=` on that column misses the boundary day. Query dates with
+  `whereDate()` (Panel #3081).
+- Panel's `IdentifierLengthTest` rebuilds Laravel's default foreign-key name from the schema
+  (SQLite exposes no FK names), so `constrained(indexName:)` can't rescue a long pivot: pick a
+  shorter table name (`organisation_required_checks`, not
+  `organisation_compliance_check_type`) (Panel #3081).
+- Filament form-level rules (`maxDate`, `after`) refuse before the action class runs: a Livewire
+  test that expects the action's toast for such input must `assertHasActionErrors` instead, or
+  the rule belongs in the action only (Panel #3081).
 - E2E that build "today" with JS local getters (`getDate()`) disagree with a UTC server
   between 00:00 and 01:00 BST (the local date is a day ahead): use the UTC getters, or
   read the date the page shows (Panel `self-service.spec.ts`, #2882).
