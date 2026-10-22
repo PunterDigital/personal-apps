@@ -435,6 +435,11 @@ For each card in Triage:
 - E2E that build "today" with JS local getters (`getDate()`) disagree with a UTC server
   between 00:00 and 01:00 BST (the local date is a day ahead): use the UTC getters, or
   read the date the page shows (Panel `self-service.spec.ts`, #2882).
+- Inertia E2E races: a login helper that returns right after the submit click can lose to the
+  next `page.goto` (the goto wins and the test lands on /login). `await expect(page).toHaveURL(...)`
+  first. `getByRole('checkbox', { name })` matches the whole `<label>` text, so a label with a
+  description span needs an `aria-label` on the input. A `page.goto` to a 403/404 logs a Chrome
+  console error: assert `collectErrors()` before such visits (Panel #3080).
 - A long parallel Playwright run on this PC can end with `net::ERR_NO_BUFFER_SPACE` console
   errors (Windows socket exhaustion, ~10 min in). Rerun the failed specs alone before blaming
   the change (Panel #2801: 42/44, then 4/4).
