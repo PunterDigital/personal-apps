@@ -517,6 +517,8 @@ fails, `git push origin $c:refs/heads/pr-assets` becomes `:refs/heads/pr-assets`
 the branch (happened on nexus-ssh, restored at once from the fetched commit). Push only after
 `git merge-base --is-ancestor origin/pr-assets $c`.
 
+**Backslashes reach Markdown and PHP tests too** (Panel #3084): the same loss hits CLAUDE.md sections and test files written via heredoc/`node -e`. Write them with the Write tool. Also: `cat > file` without a heredoc waits on stdin forever (add `</dev/null`), and `../..` log paths from a project folder land in `E:`: log into the scratchpad.
+
 **Editing PHP from the shell.** `sed` replacement strings and heredocs fed to `node -e` / `node -`
 lose the `\` in PHP namespaces: the replace silently matches nothing, or writes `AppRbacAccess`
 for `App\Rbac\Access`. Edit PHP with the Edit/Write tools (or a quoted `cat <<'EOF'` heredoc that
