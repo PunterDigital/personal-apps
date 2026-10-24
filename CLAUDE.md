@@ -451,6 +451,9 @@ For each card in Triage:
   description span needs an `aria-label` on the input. A `page.goto` to a 403/404 logs a Chrome
   console error: assert `collectErrors()` before such visits (Panel #3080).
 - Panel uses `data-test` attributes, not `data-testid`: Playwright `getByTestId` finds nothing, use `locator('[data-test="x"]')`. A new Bash call falls back to PHP 8.3 unless the 8.4 `PATH` export is repeated (Panel #3082).
+- A new Filament form field whose label contains an existing one ("Public headline" next to "Headline") breaks
+  every older spec that uses `getByRole('textbox', { name: 'Headline' })` (strict mode, 2 elements) but
+  not the new spec: add `exact: true`, and grep `tests/e2e` for the old label before pushing (Panel #3087).
 - A long parallel Playwright run on this PC can end with `net::ERR_NO_BUFFER_SPACE` console
   errors (Windows socket exhaustion, ~10 min in). Rerun the failed specs alone before blaming
   the change (Panel #2801: 42/44, then 4/4).
