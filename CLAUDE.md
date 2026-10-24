@@ -546,6 +546,11 @@ with its own `pnpm install`. `git worktree remove` fails on Windows with "Filena
 branch, so `git rebase --onto main <old-branch>` fails afterwards. A squash keeps the same tree,
 so commit the stacked work, then `git reset --soft main` and commit again: the index holds only
 the stacked changes.
+A stacked PR whose base is the first PR's branch is **closed for good** when that branch is
+deleted on merge (GitHub did not retarget it, and a closed PR can't change base or reopen:
+Nexus #36 → #37). Before merging the base PR, `gh pr edit <stacked> --base main` (the squash
+leaves the same tree, so the diff stays the stacked changes only), or merge without
+`--delete-branch`, retarget, then delete the branch.
 
 **Secret scanning.** gitleaks via Docker. Bind-mounting `E:\` paths fails in this Docker setup, so
 pipe the repo in:
