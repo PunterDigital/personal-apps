@@ -340,6 +340,12 @@ For each card in Triage:
   the top of `playwright.config.js` — workers re-load the config after the server has migrated.
   A stale `public/hot` makes pages load from a dead Vite dev server (blank page): delete it.
 - `pint` isn't always idempotent; run `pint --test` after `pint`.
+- Laravel major upgrades (Obsidian #2533, 12 -> 13 with Inertia 3 and Pest 5): `composer update -W`
+  resolves it in one go, but `boost:update` (post-update-cmd) does not refresh the version labels in
+  the CLAUDE.md `<laravel-boost-guidelines>` block: edit them by hand. Inertia 3 needs the config
+  republished (`vendor:publish --provider="Inertia\ServiceProvider" --force`) and `<title inertia>`
+  -> `<title data-inertia>`. Pest 5 keeps collision on 8.x. Dependabot does not close PRs that a
+  hand-rolled bump superseded: `gh pr close --delete-branch --comment` them after the merge.
 - A `composer update` can bump Pint (its constraint is loose) and bring new rules. `pint` then
   turns fully-qualified names into imports, and in `tests/Pest.php` it puts the `use` lines below
   the `pest()->extend(TestCase::class)` calls that need them ("The class `TestCase` was not
