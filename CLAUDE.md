@@ -563,6 +563,14 @@ pipe the repo in:
 `tar --exclude=./node_modules --exclude=./vendor -cf - . | docker run --rm -i --entrypoint sh zricethezav/gitleaks:v8.21.2 -c 'mkdir /repo && tar xf - -C /repo && git config --global --add safe.directory /repo && gitleaks git /repo --no-banner && gitleaks dir /repo --no-banner'`.
 Don't pass `-v` to the `dir` scan — it prints secrets from local `.env` files into the transcript.
 
+**Docker on this PC.** The active `docker context` is `xwave-remote` (an SSH host that times out
+from here), so a bare `docker` command fails. Use the local engine with `DOCKER_CONTEXT=desktop-linux`
+(per command or exported; don't `docker context use`, that's Shay's setting). Docker Desktop may
+not be running on an unattended night: `Start-Process "C:\Program Files\Docker\Docker\Docker
+Desktop.exe"` and poll `docker info` (≈5–30 s). For a Redis-backed test, start
+`redis:7-alpine` on a private network with no published port and run the suite in a node
+container on that network (GroundStation #2564: `REDIS_URL=redis://gs-redis:6379`).
+
 **Docker ports.** Published container ports (e.g. GroundStation's compose MySQL on 3307) are not
 reachable from the host here (ECONNREFUSED although healthy). Run DB tests inside a container on
 the compose network, piping the repo in: `tar --exclude=./node_modules --exclude=./.git -cf - . |
