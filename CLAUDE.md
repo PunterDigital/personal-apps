@@ -429,6 +429,11 @@ For each card in Triage:
   major time: MDG's first Vite 8 / Tailwind 4 deploy took 14 minutes to appear (the run
   flagged it as failed at 12). Check again next run (or `curl` the CSS for `tailwindcss v4`)
   before flagging it to Shay (no Forge log access from here) (MDG #2881).
+- A Forge deploy that never goes live (webhook delivery 200 in `gh api repos/<repo>/hooks`, but the new
+  route still 404 an hour later and the asset hash unchanged) needs Shay: there is no Forge log access
+  from here. Flag it on the merged card and push-notify, and hold further merges to that app (open the
+  PR, get CI green, leave it in Testing & CI with a "merge on hold" comment) so changes don't pile onto
+  a broken deploy (Panel #3197, Oct 25).
 - After rebasing a branch, run `npm run build` again before E2E: a stale `public/build` from before
   the rebase makes Playwright fail on UI that is already in the code.
 - Vite+ (`vite-plus`, the starter kits' toolchain) ≥ 0.3.3 needs `vite` aliased to
