@@ -476,6 +476,13 @@ For each card in Triage:
 - A long parallel Playwright run on this PC can end with `net::ERR_NO_BUFFER_SPACE` console
   errors (Windows socket exhaustion, ~10 min in). Rerun the failed specs alone before blaming
   the change (Panel #2801: 42/44, then 4/4).
+- The first Filament page after `php artisan serve` starts can take over 5 s here, so whichever
+  spec lands on `/staff` first after the 2FA challenge can fail `toHaveURL`: give that assertion
+  15 s. Filament `assertActionHidden(TestAction::make(x)->table($record))` fails with "Record [n]
+  no longer exists" when the active tab's query leaves the record out: assert on a tab that
+  includes it (Panel #3203).
+- `cmd && tail` reports tail's exit code, so a failed `npm run check` piped into tail still let a
+  push go ahead. Run checks on their own (or `set -o pipefail`) before pushing (Panel #3203).
 
 **Android (Kotlin + Gradle)**
 - Set `JAVA_HOME` to JDK 21 before `./gradlew`: Gradle < 9 dies on JDK 25 with a bare "25.0.2" error.
