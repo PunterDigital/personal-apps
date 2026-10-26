@@ -618,6 +618,13 @@ not picked up by the build step, and it moves to Done once all its pieces are re
 - Dependabot runs that fail with `ERR_PNPM_NO_MATURE_MATCHING_VERSION` aren't config bugs: its release-age
   gate refuses versions only a day or two old, which a fresh direct-dependency bump (e.g. `^44.9.0`)
   forces. They clear by themselves (Nexus, Oct 2026).
+- Transitive audit fixes: `pnpm up <pkg> --depth Infinity` works on pnpm 10 (ProjectTrucks), but on
+  pnpm 11 (Clerq) it, an `overrides` entry in `pnpm-workspace.yaml`, and a remove/re-add of the parent
+  all left vite 8.0.16 in the lockfile ("Already up to date", unmet peer warning), though a fresh
+  pnpm 11 install resolves 8.3.5. Don't spend a run on it: card it and try a different route (#3270).
+- If a run's log entry is missing, reconstruct what it did from `gh release list`, open `claude/*`
+  PRs and the board's latest `🤖 Claude:` comments before carrying on (the Oct 26 00:xx train
+  released five apps, opened three PRs and logged nothing).
 - Tauri apps: Dependabot's separate npm and cargo minor groups each fail `tauri build` ("mismatched
   Tauri packages"), because `@tauri-apps/*` and the `tauri*` crates must move together. ProjectTrucks'
   Dependabot now ignores Tauri minor/patch bumps: bump both sides by hand in one PR each Monday
