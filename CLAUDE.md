@@ -625,7 +625,9 @@ not picked up by the build step, and it moves to Done once all its pieces are re
 - Transitive audit fixes: `pnpm up <pkg> --depth Infinity` works on pnpm 10 (ProjectTrucks), but on
   pnpm 11 (Clerq) it, an `overrides` entry in `pnpm-workspace.yaml`, and a remove/re-add of the parent
   all left vite 8.0.16 in the lockfile ("Already up to date", unmet peer warning), though a fresh
-  pnpm 11 install resolves 8.3.5. Don't spend a run on it: card it and try a different route (#3270).
+  pnpm 11 install resolves 8.3.5. The cause: vite is a *peer* of vitest (it shows in the snapshot key,
+  `vitest@4.1.8(...)(vite@8.0.16(...))`), and pnpm keeps a resolved peer. Adding it as a direct
+  devDependency (`pnpm add -D vite@^8.3.5`) lifted it at once (Clerq #71). Check `pnpm why` first.
 - If a run's log entry is missing, reconstruct what it did from `gh release list`, open `claude/*`
   PRs and the board's latest `🤖 Claude:` comments before carrying on (the Oct 26 00:xx train
   released five apps, opened three PRs and logged nothing).
