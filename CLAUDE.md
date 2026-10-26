@@ -81,6 +81,11 @@ Runs every 3 hours, 09:00–21:00 local. Each run:
 
 0. **Lock.** If `ops/run.lock` exists and is < 3h old, another run is active: log and exit. Otherwise
    write the lock (timestamp) and delete it at the end, success or failure.
+   An interactive session that carries on pipeline work after its run (e.g. Shay hands it a deploy
+   log) writes the lock too. Without one, a run and that session both merged Panel PRs and fixed the
+   same bug twice (Oct 26, #3365). So before touching a project, check for `claude/*` pushes or new
+   PRs from the last hour that this run didn't make, and `list_sessions` for a running "Personal
+   Apps" session in this folder; if one is running, leave that project alone this run.
    An interactive session with Shay that merges, builds or moves cards takes the lock as well:
    otherwise the next scheduled run starts the same queue in the same checkouts (Oct 26: both
    merged held Panel PRs and opened duplicate fixes, #65/#66).
@@ -312,6 +317,9 @@ For each card in Triage:
   just the web link. Releases are still tagged and published in the repo.
 - `gh api .../actions/runners` needs `admin:org`, which the gh token lacks: the runner's health
   is only visible through whether jobs get picked up.
+- A hung job blocks every private repo's CI. Panel's E2E step once sat 66 minutes with no output
+  and no job `timeout-minutes` (the default is 6 h); cancel and rerun (it passed in 8 min), and keep
+  an eye on runs over 20 minutes (Oct 26).
 - The self-hosted runner runs one job at a time. Turning on Dependabot opens a burst of PRs whose
   CI fills the queue, so a release tag pushed right after onboarding can wait 10+ minutes. Push
   the tag before enabling Dependabot, or expect the wait.
@@ -544,6 +552,14 @@ it by port afterwards (`Get-NetTCPConnection -LocalPort <n>` → `Stop-Process`)
 **Updating a PR branch after another PR merged.** Don't force-push a rebase. Rebase locally and test,
 then push a merge commit with that exact tree on top of the remote branch:
 `git commit-tree $(git rev-parse HEAD^{tree}) -p origin/<branch> -p main`.
+After squash merges the old ancestry is gone, so `git merge main` into a sibling or stacked PR
+conflicts on files it never touched. Take the PR's own diff instead
+(`git diff $(git merge-base origin/main <branch>) origin/<branch>`, or against its old stacked base),
+`git apply --3way --index` it onto a worktree of main, resolve, test, then `commit-tree` that tree
+with parents `origin/<branch>` and `origin/main` (Panel #61/#62, Oct 26).
+Panel's E2ESeeder, `tests/e2e/fixtures.ts`, `routes/console.php` and CLAUDE.md conflict on every
+parallel card, always additively. `node scripts/union-merge.mjs <files>` (keep both sides, ours
+first) handles most of it, but check each seam: when both sides end just before a shared `}` the result loses a brace.
 
 **Screenshots in PRs.** `gh` can't upload images. Commit them to an orphan `pr-assets` branch in the
 app repo (`git hash-object -w` → `git mktree` → `git commit-tree` → `git push origin <sha>:refs/heads/pr-assets`,
