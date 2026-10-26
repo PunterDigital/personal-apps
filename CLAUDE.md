@@ -310,6 +310,14 @@ For each card in Triage:
   tauri-action v1 updates the name and body of an existing release from its inputs (empty body =
   notes wiped): export the generated notes as a job output and pass them as `releaseBody`
   (ProjectTrucks `release.yml`).
+- Self-update without Tauri's updater plugin (no signing key): download the `_x64-setup.exe`,
+  check GitHub's asset `digest` (`sha256:…`, on every release asset), run it with `/P /R /UPDATE`
+  (passive, relaunch, keep removed shortcuts removed) and exit. To test: build an older version
+  with `pnpm tauri build --no-bundle --config '{"version":"0.4.0"}'` and serve a stub
+  `*setup.exe` from a local feed. The stub needs an `asInvoker` manifest, or Windows' installer
+  detection asks for elevation from the name alone (`rustc stub.rs -C link-arg=/MANIFEST:EMBED
+  "-Clink-arg=/MANIFESTUAC:level='asInvoker' uiAccess='false'"`). Never run a real installer:
+  it replaces Shay's install (ProjectTrucks #3354).
 
 **Private repos (free plan)**
 - No branch protection or rulesets (needs GitHub Pro): there are no required checks, so confirm CI
@@ -539,6 +547,16 @@ For each card in Triage:
   needs `api-level: '37.0'` **quoted**: a bare `37.0` is YAML's number 37 and `android-37` doesn't
   exist (first CI run failed). Set `pageAlignment = FORCE_4KB_PAGES` on the managed device, or AGP
   warns on every build that it can't tell the 37.0 image's page size (World Explorer #2711).
+- Emulators on this PC (the managed device too) get no working DNS, so the network never
+  validates: OSM tiles fail and DownloadManager waits forever, even for a 127.0.0.1 URL. Boot a
+  scratch emulator with `-dns-server 8.8.8.8` (launch it with `exec` in a `run_in_background`
+  Bash call; `&` inside a call is fragile). CI emulators are fine.
+- `appops set <pkg> REQUEST_INSTALL_PACKAGES deny|default` kills the app's process and the
+  instrumentation with it ("Test failed with status -1", rest of the class skipped). Fake the
+  permission with a debug-only override instead. To check app data survives an update of a
+  release (non-debuggable) build, use `adb root` + `/system/bin/sqlite3` on a google_apis image;
+  `run-as` doesn't work there. A slow emulator can turn Espresso's `click()` into a long press:
+  use `performClick()` via `scenario.onActivity` (World Explorer #3355).
 
 **Built-in browser on an unattended run.** The pane may never draw (viewport 0x0, then "Could not
 get the tab ready for input" on clicks). `read_page`, `find`, `form_input`, `get_page_text` and
