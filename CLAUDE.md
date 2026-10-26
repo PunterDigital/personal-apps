@@ -327,6 +327,10 @@ For each card in Triage:
   seed, build and Playwright inside `mcr.microsoft.com/playwright:v<version>-noble` on a Docker
   network with the DB (recipe in Clerq's local `CLAUDE.md`).
 - Clerq gitignores `CLAUDE.md`/`.claude/` on purpose: its project notes stay local, uncommitted.
+- Clerq's only API is MCP JSON-RPC (`POST /api/mcp`, `tools/call`; the `Accept` header must list
+  `application/json, text/event-stream` or it answers 406). Its bearer tokens are better-auth `mcp()`
+  OAuth tokens that expire after 1 hour, so another app can't use a static token (#3330).
+  `update_client` overwrites every field: `get_client` first and send the rest back (Panel #3200).
 
 **Laravel web apps (Forge-hosted)**
 - No desktop builds: CI is one ubuntu job (Pint, `npm run build`, Pest, Playwright E2E). Forge
