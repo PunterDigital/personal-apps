@@ -273,7 +273,11 @@ For each card in Triage:
 - Auto-update can be tested for real without touching Shay's install: package with
   `-c.extraMetadata.version=<older>` and run it with a test profile plus the app's opt-in env
   (Nexus: `NEXUS_UPDATE_IN_TEST_PROFILE=1`). It downloads the current release. Never click
-  "Restart to update", and delete `%LOCALAPPDATA%/<app>-updater` afterwards.
+  "Restart to update". Afterwards delete only `%LOCALAPPDATA%/<app>-updater/pending`: the folder
+  itself holds `installer.exe` from Shay's real install (NSIS keeps it, even for `publish: null` apps).
+  Build the NSIS target, not `--dir` (no `resources/app-update.yml`). For a local feed, edit
+  `win-unpacked/resources/app-update.yml` by hand (`provider: generic`, `url:`); a
+  `-c.publish.provider=generic` override fails the schema when the yml sets owner/repo (Finance #3353).
 - An uncaught exception in the main process pops a native "A JavaScript error occurred" dialog on
   Shay's screen, even during E2E. Express's `res.download` callback runs while Windows still has the
   file open, so deleting it there throws (ENOTEMPTY). Send a Buffer, or clean up later (Finance #2719).
@@ -596,7 +600,9 @@ with its own `pnpm install`. `git worktree remove` fails on Windows with "Filena
 **Stacking a branch on an open PR.** `gh pr merge --squash --delete-branch` also deletes the local
 branch, so `git rebase --onto main <old-branch>` fails afterwards. A squash keeps the same tree,
 so commit the stacked work, then `git reset --soft main` and commit again: the index holds only
-the stacked changes.
+the stacked changes. Run `git add -A` and check `git status` before any such squash commit:
+edits made after the last `git add` are silently left out (Panel #3201: a Pint fix and CLAUDE.md
+missed the push, CI went red on Pint).
 A stacked PR whose base is the first PR's branch is **closed for good** when that branch is
 deleted on merge (GitHub did not retarget it, and a closed PR can't change base or reopen:
 Nexus #36 → #37). Before merging the base PR, `gh pr edit <stacked> --base main` (the squash
