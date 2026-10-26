@@ -81,6 +81,9 @@ Runs every 3 hours, 09:00–21:00 local. Each run:
 
 0. **Lock.** If `ops/run.lock` exists and is < 3h old, another run is active: log and exit. Otherwise
    write the lock (timestamp) and delete it at the end, success or failure.
+   An interactive session with Shay that merges, builds or moves cards takes the lock as well:
+   otherwise the next scheduled run starts the same queue in the same checkouts (Oct 26: both
+   merged held Panel PRs and opened duplicate fixes, #65/#66).
 1. **Sync.** `git pull` the control repo. For each project in `projects.json`, `git fetch` and make sure
    the local `main` is up to date and the working tree is clean (stash nothing silently — if dirty and
    not from an in-flight Claude branch, flag it on a card / push notification and skip that project).
@@ -438,6 +441,12 @@ For each card in Triage:
   from here. Flag it on the merged card and push-notify, and hold further merges to that app (open the
   PR, get CI green, leave it in Testing & CI with a "merge on hold" comment) so changes don't pile onto
   a broken deploy (Panel #3197, Oct 25).
+  Forge doesn't retry a failed deploy: production stays on the old release until the next push to
+  `main`. Panel's cause was the build, not the code: laravel-vite-plugin's `bunny()` font provider
+  downloads fonts during `vp build`, and one ETIMEDOUT on the server failed it. Builds that run on
+  Forge must not need the network beyond the package registries: commit the font files and use
+  `local()` (Panel `vite.config.ts`). MDG and Obsidian load Bunny with a `<link>` in the browser,
+  which can't fail a deploy (#3197, Oct 26).
 - After rebasing a branch, run `npm run build` again before E2E: a stale `public/build` from before
   the rebase makes Playwright fail on UI that is already in the code.
 - Vite+ (`vite-plus`, the starter kits' toolchain) ≥ 0.3.3 needs `vite` aliased to
