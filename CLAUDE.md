@@ -182,6 +182,11 @@ For each card in Triage:
      would hit the control repo — run `git init -b main` in the folder first.
    - Shay may name a project that has no folder yet: find it with `gh repo list PunterDigital`
      (and `ShayPunter`) and `git clone` it into a top-level folder of that name.
+   - A project moved in from elsewhere on disk may be a subfolder of what Shay names (AniTrack's
+     app was `E:\anime-list\backend`), checked out on an old feature branch: switch to `main` and
+     pull before judging it. Its `.claude/worktrees/*` no longer point anywhere: `git worktree prune`.
+     The registry `repo` can differ from the folder name (`PunterDigital/anime-list` → `anitrack`);
+     don't rename a Forge-linked repo without asking.
    - Check every workflow's `runs-on`: the org's self-hosted runner group accepts public repos
      (Clerq's CI ran on it), so a public repo can arrive using it. Move it to GitHub-hosted.
    - Copied-in `node_modules` are usually broken (pnpm symlinks don't survive copies): delete and

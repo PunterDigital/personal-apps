@@ -136,6 +136,19 @@
       "webUrl": "https://panel.punterdigital.com/",
       "private": true,
       "status": "hidden"
+    },
+    {
+      "name": "AniTrack",
+      "slug": "anitrack",
+      "folder": "anitrack",
+      "repo": "PunterDigital/anime-list",
+      "tag": "anitrack",
+      "description": "Track the anime you watch, plan what's next and discover something new: a full AniList-synced catalogue, seasonal charts, airing schedule, MAL import and a public API.",
+      "platforms": [
+        "web"
+      ],
+      "webUrl": "https://anitrack.app/",
+      "status": "active"
     }
   ]
 }
