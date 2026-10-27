@@ -187,6 +187,9 @@ For each card in Triage:
      pull before judging it. Its `.claude/worktrees/*` no longer point anywhere: `git worktree prune`.
      The registry `repo` can differ from the folder name (`PunterDigital/anime-list` → `anitrack`);
      don't rename a Forge-linked repo without asking.
+     Check `git remote -v` matches the registry `repo`: a repo transferred from `ShayPunter` keeps
+     the old URL, pushes still work through GitHub's redirect, but `gh pr create` fails ("Head
+     sha can't be blank … No commits between"). `git remote set-url origin` to the new owner.
    - Check every workflow's `runs-on`: the org's self-hosted runner group accepts public repos
      (Clerq's CI ran on it), so a public repo can arrive using it. Move it to GitHub-hosted.
    - Copied-in `node_modules` are usually broken (pnpm symlinks don't survive copies): delete and
