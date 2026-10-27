@@ -15,6 +15,7 @@
 /.claude/settings.local.json
 /.claude/worktrees/
 /ops/run-log.md
+/ops/run-log-archive.md
 /ops/run.lock
 _site/
 node_modules/
