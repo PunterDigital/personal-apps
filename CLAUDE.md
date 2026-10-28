@@ -366,6 +366,9 @@ For each card in Triage:
 **Laravel web apps (Forge-hosted)**
 - No desktop builds: CI is one ubuntu job (Pint, `npm run build`, Pest, Playwright E2E). Forge
   auto-deploys `main` on push, so every merge is a production deploy; check the live site after.
+  That covers Panel, MDG, Obsidian and AniTrack, just like GroundStation's own deploy (Shay, Oct 28).
+  A dependency bump on such an app is a production change too: AniTrack's Vue 3.5.44 advisory
+  bump shipped broken SSR ("[object Promise]" in every page) until #3408. Its E2E now covers SSR.
   A release is a tag + GitHub Release with notes; registry entry is `platforms: ["web"]` + `webUrl`.
 - `phpunit.xml` must force in-memory SQLite: Breeze's Pest suite uses `RefreshDatabase` and would
   otherwise wipe the `.env` database.
