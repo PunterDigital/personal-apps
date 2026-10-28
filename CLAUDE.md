@@ -697,6 +697,10 @@ not picked up by the build step, and it moves to Done once all its pieces are re
   pnpm 11 install resolves 8.3.5. The cause: vite is a *peer* of vitest (it shows in the snapshot key,
   `vitest@4.1.8(...)(vite@8.0.16(...))`), and pnpm keeps a resolved peer. Adding it as a direct
   devDependency (`pnpm add -D vite@^8.3.5`) lifted it at once (Clerq #71). Check `pnpm why` first.
+- Node image majors (`node:24-alpine` → `26-alpine`): Node 25+ no longer ships corepack, so a
+  Dockerfile's `corepack enable` fails. CI that doesn't build the image stays green on the
+  Dependabot PR. Install it first (`npm install -g corepack@<v> && corepack enable`) and build
+  the image locally before merging (Clerq #3273).
 - If a run's log entry is missing, reconstruct what it did from `gh release list`, open `claude/*`
   PRs and the board's latest `🤖 Claude:` comments before carrying on (the Oct 26 00:xx train
   released five apps, opened three PRs and logged nothing).
