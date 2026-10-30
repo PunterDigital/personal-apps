@@ -478,6 +478,12 @@ For each card in Triage:
   Forge must not need the network beyond the package registries: commit the font files and use
   `local()` (Panel `vite.config.ts`). MDG and Obsidian load Bunny with a `<link>` in the browser,
   which can't fail a deploy (#3197, Oct 26).
+- Forge's default `.env` has `APP_URL=http://<domain>` and adding the certificate doesn't change it.
+  Anything that compares APP_URL with the browser's origin breaks on the https site: passkeys
+  failed with "Invalid origin. Not in the list of allowed origins." Panel now allows the https
+  origin of APP_URL's host (`App\Auth\PasskeyOrigins`). WebAuthn refuses an IP as RP ID, so check
+  passkeys on `php artisan serve --host=localhost` with a CDP virtual authenticator, not on the
+  E2E server's `127.0.0.1` (Panel #3531).
 - After rebasing a branch, run `npm run build` again before E2E: a stale `public/build` from before
   the rebase makes Playwright fail on UI that is already in the code.
 - Vite+ (`vite-plus`, the starter kits' toolchain) ≥ 0.3.3 needs `vite` aliased to
