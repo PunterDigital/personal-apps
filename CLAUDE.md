@@ -77,7 +77,8 @@ the tag the next time the card is touched. Only one `priority:` tag per card: re
 
 ## Scheduled run procedure
 
-Runs every 3 hours, 09:00–21:00 local. Each run:
+Runs every 2 hours, 09:00–23:00 local, plus 00:00 (scheduled task `personal-apps-run`, cron
+`0 0,9/2 * * *`). Each run:
 
 0. **Lock.** If `ops/run.lock` exists and is < 3h old, another run is active: log and exit. Otherwise
    write the lock (timestamp) and delete it at the end, success or failure.
