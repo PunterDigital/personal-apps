@@ -105,6 +105,9 @@ Runs every 3 hours, 09:00–21:00 local. Each run:
    question (the description counts as written at card creation) is Shay's answer. Remove
    `needs answer`, reply `🤖 Claude: Thanks — …` with what you'll do, and re-triage with the new info
    (usually → Ready with acceptance criteria). If unanswered for 7 days, push-notify once.
+   Shay often answers while a run is going: the Oct 30 11:10 run read Needs Info at its start
+   and missed three answers posted 15 minutes later. Before the report (step 8), check
+   `list_activity` for comments newer than the run's start and act on them.
    Shay also comments on cards in other columns (objections on Ready cards, notes on In Progress).
    Read the full comment thread of any card before you build, merge or release it, and act on any
    un-prefixed comment newer than Claude's last one.
