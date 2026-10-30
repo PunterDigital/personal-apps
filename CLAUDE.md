@@ -487,6 +487,25 @@ For each card in Triage:
   origin of APP_URL's host (`App\Auth\PasskeyOrigins`). WebAuthn refuses an IP as RP ID, so check
   passkeys on `php artisan serve --host=localhost` with a CDP virtual authenticator, not on the
   E2E server's `127.0.0.1` (Panel #3531).
+- PHPUnit on MySQL in a Laravel app's CI (Panel #3674, Shay's request after the #3671 deadlock
+  that SQLite CI couldn't see): the self-hosted runner can't reach a service's published port
+  (Connection refused, as in GroundStation), so pipe the tree, `vendor/`, `.env` and the build
+  into `php:8.4-cli` on `${{ job.services.mysql.network }}` (host = the service name). The image
+  lacks intl, zip, pdo_mysql and gd, and caps memory at 128M (`memory_limit=-1` in a conf.d
+  file). `phpunit.xml`'s unforced `DB_*` let `-e DB_CONNECTION=mysql …` win. The job context
+  (`job.services`) isn't available in job-level `env`: a workflow using it fails to start
+  ("workflow file issue", no checks on the PR). MySQL JSON columns reorder object keys, so
+  `assertSame` on a decoded JSON array fails on order alone: use `assertEquals`. E2E stays on
+  SQLite (the browser and server run on the runner). A PR that is CONFLICTING gets no
+  `pull_request` CI at all: resolve with the `commit-tree` merge below.
+- MySQL row-lock bugs (deadlocks between a request and an immediate webhook, Panel #3671):
+  a `FOR UPDATE` on a unique column that matches nothing gap-locks the index. Find the id with
+  a plain read and lock by primary key. A MySQL-only test can hold the row on the test's
+  connection and run the other side on a cloned connection with
+  `innodb_lock_wait_timeout = 1` (Panel `ContractSigningTest`).
+- A Filament page left in a background tab (a spec opened a second `browser.newPage()` for the
+  client) never pulls its toast: `bringToFront()` before the next action whose toast you assert
+  (Panel `organisation-approval.spec.ts`, #3536).
 - After rebasing a branch, run `npm run build` again before E2E: a stale `public/build` from before
   the rebase makes Playwright fail on UI that is already in the code.
 - Vite+ (`vite-plus`, the starter kits' toolchain) ≥ 0.3.3 needs `vite` aliased to
