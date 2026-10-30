@@ -605,6 +605,8 @@ app repo (`git hash-object -w` → `git mktree` → `git commit-tree` → `git p
 one folder per card) and embed `https://raw.githubusercontent.com/<repo>/pr-assets/<card>/<file>.png`.
 `main` stays image-free. Capture with a temporary Playwright spec that is never committed, and point
 any file browser at a temp dir, never Shay's home folder.
+Give Node/Playwright a Windows path (`C:/Users/...`), not Git Bash's `/c/Users/...`: Node reads
+that as a path on the current drive and wrote the screenshot to `E:\c\Users\...` (Panel #3535).
 Guard the script (`set -e`, `test -n "$c"`, feed `git mktree` from a file): if `git commit-tree`
 fails, `git push origin $c:refs/heads/pr-assets` becomes `:refs/heads/pr-assets` and **deletes**
 the branch (happened on nexus-ssh, restored at once from the fetched commit). Push only after
