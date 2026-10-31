@@ -403,6 +403,12 @@ For each card in Triage:
   Livewire property), not the re-fetched record (Panel `ViewApplication::$shownStatus`).
 - Filament in Playwright: list-page tabs are `button`s, not `tab`s, and relation managers load
   lazily ("Loading...") until scrolled into view (`scrollIntoViewIfNeeded()`).
+  A Filament `FileUpload` never worked in E2E: with `APP_ENV=testing` Livewire stores temporary
+  uploads on a `tmp-for-tests` disk and, when it isn't configured, calls `Storage::fake()` on every
+  request (a new process each under `artisan serve`), wiping the upload before Save (FilePond
+  "processing-error"). Define the disk in `config/filesystems.php` (Panel #3598). A table action
+  named `edit` makes the whole row a button whose name holds the row text, which breaks older
+  `getByRole('button', { name })` lookups: `->recordAction(null)` keeps rows plain.
 - A Filament `Select::options(SomeEnum::class)` gives the action the enum instance, not its
   value: `SomeEnum::from($data['x'])` is a TypeError (500) only in the browser, since tests that
   pass plain strings skip the cast. Accept both in the action, and test the form through
