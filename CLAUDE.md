@@ -687,8 +687,10 @@ from here), so a bare `docker` command fails. Use the local engine with `DOCKER_
 (per command or exported; don't `docker context use`, that's Shay's setting). Docker Desktop may
 not be running on an unattended night: `Start-Process "C:\Program Files\Docker\Docker\Docker
 Desktop.exe"` and poll `docker info` (≈5–30 s). On Oct 30 it never came up in two runs (even
-`docker version` hung). Give it ~5 minutes, then push and let CI's Postgres/MySQL job run the
-E2E, and say on the PR and card that local E2E didn't run (Clerq #74). For a Redis-backed test, start
+`docker version` hung), and on Oct 31 the process was running but the engine still hung
+(`docker version` timed out) for a whole afternoon of runs. Give it ~5 minutes, then push and
+let CI's Postgres/MySQL job run the E2E, and say on the PR and card that local E2E didn't run
+(Clerq #74, #77, #78). Check in CI's E2E log that the new spec actually ran. For a Redis-backed test, start
 `redis:7-alpine` on a private network with no published port and run the suite in a node
 container on that network (GroundStation #2564: `REDIS_URL=redis://gs-redis:6379`).
 
