@@ -749,6 +749,11 @@ not picked up by the build step, and it moves to Done once all its pieces are re
 - Tests that build dates with Carbon `subMonths()` / `addMonths()` overflow at month end
   (Oct 31 − 6 months = May 1), so date-relative tests go red on the 29th–31st and every Dependabot
   PR opened then looks broken. Use the `NoOverflow` variants or freeze the clock (Obsidian #3837).
+  Month arithmetic can't reach every date: with a 6-month window no anchor expires on Oct 31,
+  whichever form you use, so an "expiring in N days" factory fails on the **28th** too. Freeze
+  the clock. And overflowing `addMonths` isn't monotonic (Aug 31 + 6 = Mar 3, Sep 1 + 6 = Mar 1):
+  a shown date from `addMonths` with a cleanup cutoff from `subMonths` deleted packs before
+  their shown date. Use NoOverflow on both sides.
 - Deploys without a hashed asset: GroundStation's `/public/js/app.js` `Last-Modified` is the image
   build time; for a Forge app whose bump leaves the hash unchanged, `/build/manifest.json`'s
   `Last-Modified` still moves (MDG, Nov 2).
