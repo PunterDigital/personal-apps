@@ -520,8 +520,11 @@ For each card in Triage:
   peers). Upgrading it with npm: the old lock keeps `vite@8` on top and npm fails with a
   misleading `@vue/language-core` peer conflict; delete the toolchain entries from
   `package-lock.json` and reinstall. `vp migrate` switches the project to pnpm (reverted). Vite+
-  1.x also needs vue-tsc 3.2/3.3: 3.3.12–3.3.13 break `types:check` on any `https://` in a
-  template attribute (vuejs/language-tools#6240), so Panel pins 3.3.11 (Panel #2801).
+  1.x also needs vue-tsc 3.2/3.3: 3.3.12–3.3.14 break `types:check` on any `https://` in a
+  template attribute (vuejs/language-tools#6240), so Panel and AniTrack pin 3.3.11 (Panel #2801,
+  AniTrack #88). A Dependabot group that pulls a newer vue-tsc in needs the pin back.
+  Larastan 3.13.2+ reads the `#[Signature]` attribute, so an `is_string()` check on a required
+  command argument is "always true" and fails PHPStan (Panel #116).
 - A `date:Y-m-d` cast only formats on read: Eloquent still writes `Y-m-d H:i:s`, so on SQLite
   a string `BETWEEN` / `>=` on that column misses the boundary day. Query dates with
   `whereDate()` (Panel #3081).
@@ -727,6 +730,21 @@ not picked up by the build step, and it moves to Done once all its pieces are re
 ## Weekly maintenance (Monday run, before the release train)
 
 - Review and merge green Dependabot PRs (patch/minor); majors become cards.
+  A `@dependabot rebase` on a stale *group* PR can come back "updatable in another way": it closes
+  that PR and opens a new, bigger group. Look for the new number instead of waiting (Clerq #80,
+  ProjectTrucks #47). On ShayPunter/million-dollar-challenge it got no answer at all:
+  `gh pr update-branch <n>` re-runs CI there.
+  On a repo whose CI runs on the self-hosted runner (Panel: ~20 min a run, one job at a time),
+  don't merge eight lockfile PRs one by one: do one `chore(deps)` branch with all the patch/minor
+  bumps, run CI once, merge, then `gh pr close` the superseded ones (Panel #116, Nov 2).
+  `gh run rerun --failed` on a `pull_request` run reuses its old merge commit: after another PR
+  merged in the meantime it does not test the combined tree. Wait for main's own CI after the merge.
+- Tests that build dates with Carbon `subMonths()` / `addMonths()` overflow at month end
+  (Oct 31 − 6 months = May 1), so date-relative tests go red on the 29th–31st and every Dependabot
+  PR opened then looks broken. Use the `NoOverflow` variants or freeze the clock (Obsidian #3837).
+- Deploys without a hashed asset: GroundStation's `/public/js/app.js` `Last-Modified` is the image
+  build time; for a Forge app whose bump leaves the hash unchanged, `/build/manifest.json`'s
+  `Last-Modified` still moves (MDG, Nov 2).
 - Check the last CI run on each `main` is green; investigate red.
 - `npm audit` (or equivalent) — high/critical findings become `bug` cards.
 - Dependabot runs that fail with `ERR_PNPM_NO_MATURE_MATCHING_VERSION` aren't config bugs: its release-age
@@ -751,6 +769,13 @@ not picked up by the build step, and it moves to Done once all its pieces are re
   (recipe in its `CLAUDE.md`, "Dependency updates") (ProjectTrucks #2879).
 - The release train is a good fit for parallel sub-agents (one per project, release + maintenance,
   no board writes); the parent moves cards and rebuilds the downloads page once at the end.
+  Nov 2: seven agents (the two Forge Laravel apps paired, the two private repos paired) plus Panel
+  in the parent finished ten projects in ~80 minutes. Expect macOS hosted runners to queue 10–15
+  min when several apps release at once, and local E2E to time out on logins while the agents
+  build: rerun alone or trust CI.
+- A crashed run leaves `ops/run.lock` and possibly uncommitted work on a `claude/*` branch. When
+  the lock is stale and no session is running, take the lock, `git add -A && git commit` the WIP on
+  that branch before any other git command, then finish the card from there (Panel #3600, Nov 2).
 
 ## Permissions
 
