@@ -536,6 +536,17 @@ For each card in Triage:
   old URL: wait for something on the new page first.
 - After rebasing a branch, run `npm run build` again before E2E: a stale `public/build` from before
   the rebase makes Playwright fail on UI that is already in the code.
+- Error pages rendered from `withExceptions()->respond()`: an unmatched URL never runs the web
+  middleware (no session, so a signed-in user looks like a guest), and a route-binding or CSRF
+  error comes before `HandleInertiaRequests` (no shared props: the layout's `route()` and auth
+  break). A `Route::fallback` fixes the session, but it is GET-only, so a POST to an unknown URL
+  turns into 405: use `Route::any('{fallbackPlaceholder}', ...)->where(..., '.*')->fallback()
+  ->withoutMiddleware(<CSRF class>)`, and share the layout props in the handler when
+  `Inertia::getShared('auth')` is null (AniTrack `App\Support\ErrorPageProps`, #3916).
+- A product name in browser tabs: Inertia 3's `createInertiaApp({ title: (title, page) => … })`
+  gets the page, so read a shared `name` prop. `VITE_APP_NAME` bakes the server's `.env` value
+  into the Forge build. Don't rename via `APP_NAME` on a live app: it also names the session
+  cookie and cache prefix, so everyone gets signed out (Panel #3602).
 - Vite+ (`vite-plus`, the starter kits' toolchain) ≥ 0.3.3 needs `vite` aliased to
   `npm:@voidzero-dev/vite-plus-core@<same version>` (plus an `overrides.vite` for the plugins'
   peers). Upgrading it with npm: the old lock keeps `vite@8` on top and npm fails with a
@@ -656,6 +667,8 @@ first) handles most of it, but check each seam: when both sides end just before 
 **Screenshots in PRs.** `gh` can't upload images. Commit them to an orphan `pr-assets` branch in the
 app repo (`git hash-object -w` → `git mktree` → `git commit-tree` → `git push origin <sha>:refs/heads/pr-assets`,
 one folder per card) and embed `https://raw.githubusercontent.com/<repo>/pr-assets/<card>/<file>.png`.
+Private repos (Panel, GroundStation, Obsidian): raw.githubusercontent images don't load there, so
+embed `https://github.com/<repo>/blob/pr-assets/<card>/<file>.png?raw=true` (Panel #3602).
 `main` stays image-free. Capture with a temporary Playwright spec that is never committed, and point
 any file browser at a temp dir, never Shay's home folder.
 Give Node/Playwright a Windows path (`C:/Users/...`), not Git Bash's `/c/Users/...`: Node reads
