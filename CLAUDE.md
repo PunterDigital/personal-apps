@@ -534,6 +534,9 @@ For each card in Triage:
   `login()` that calls `Auth::login($user)`, then test what the controller does after the check
   (AniTrack #3877). Playwright's `page.url()` right after clicking an Inertia link can still be the
   old URL: wait for something on the new page first.
+- Add new E2E seed data at the **end** of an `E2ESeeder`: a new organisation seeded mid-file shifts the
+  ids of every later record, and an older spec that depends on them broke (Panel `organisation-approval`
+  failed with a Livewire entangle error until the seed moved, #3605).
 - After rebasing a branch, run `npm run build` again before E2E: a stale `public/build` from before
   the rebase makes Playwright fail on UI that is already in the code.
 - Error pages rendered from `withExceptions()->respond()`: an unmatched URL never runs the web
