@@ -520,6 +520,15 @@ For each card in Triage:
 - A Filament page left in a background tab (a spec opened a second `browser.newPage()` for the
   client) never pulls its toast: `bringToFront()` before the next action whose toast you assert
   (Panel `organisation-approval.spec.ts`, #3536).
+- Filament's confirmation modal is an `alertdialog` whose own box has no size: `toBeVisible()` on
+  it fails ("hidden") even while it's open. Assert its heading. A click on a section action before
+  Livewire has loaded opens nothing: wait for the page to settle, or retry the click until the
+  heading shows (Panel `rate-four-eyes.spec.ts`, #3650).
+- Laragear WebAuthn (passkeys) in Pest without an authenticator: bind a subclass of
+  `Laragear\WebAuthn\Http\Requests\AssertedRequest` in the container with `rules()` = `[]` and a
+  `login()` that calls `Auth::login($user)`, then test what the controller does after the check
+  (AniTrack #3877). Playwright's `page.url()` right after clicking an Inertia link can still be the
+  old URL: wait for something on the new page first.
 - After rebasing a branch, run `npm run build` again before E2E: a stale `public/build` from before
   the rebase makes Playwright fail on UI that is already in the code.
 - Vite+ (`vite-plus`, the starter kits' toolchain) ≥ 0.3.3 needs `vite` aliased to
