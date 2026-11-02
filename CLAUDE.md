@@ -142,6 +142,12 @@ For each card in Triage:
      parent listing them, and move the parent to Done once all pieces are released.
 4. **Always ask first (Needs Info) before:** breaking changes to user data or config formats, deleting
    features, adding paid services/APIs, changing licence, anything touching credentials or secrets.
+5. **Big batches** (Nov 2: 41 Panel QA cards at once): split them by area across 3–4 read-only
+   sub-agents that fetch the cards, check the code and return draft comments; the parent posts,
+   tags and moves. Tag ids: `claude` 17, `bug` 18, `needs answer` 16, `size: s|m|l` 20/19/21,
+   `priority: low|medium|high` 32/33/34. Shay's QA codes carry a severity (EH/AH = high,
+   EM/AM/NM = medium, EL/AL/NL = low; AN cards say it in the body): use it as the priority unless
+   there's a reason, and say the reason.
 
 ## Feature workflow
 
