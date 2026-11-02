@@ -387,6 +387,9 @@ For each card in Triage:
   the top of `playwright.config.js` — workers re-load the config after the server has migrated.
   A stale `public/hot` makes pages load from a dead Vite dev server (blank page): delete it.
 - `pint` isn't always idempotent; run `pint --test` after `pint`.
+- `laravel/pao` (Panel) sees Claude's env (`AI_AGENT`) and turns PHPUnit/PHPStan output into a
+  one-line JSON summary that leaves out deprecations and warnings. To read the full report (e.g.
+  after a PHPUnit major), run with `PAO_DISABLE=1` (Panel #3796).
 - Laravel major upgrades (Obsidian #2533, 12 -> 13 with Inertia 3 and Pest 5): `composer update -W`
   resolves it in one go, but `boost:update` (post-update-cmd) does not refresh the version labels in
   the CLAUDE.md `<laravel-boost-guidelines>` block: edit them by hand. Inertia 3 needs the config
@@ -798,6 +801,9 @@ not picked up by the build step, and it moves to Done once all its pieces are re
   pnpm 11 install resolves 8.3.5. The cause: vite is a *peer* of vitest (it shows in the snapshot key,
   `vitest@4.1.8(...)(vite@8.0.16(...))`), and pnpm keeps a resolved peer. Adding it as a direct
   devDependency (`pnpm add -D vite@^8.3.5`) lifted it at once (Clerq #71). Check `pnpm why` first.
+  pnpm 10 does the same when a major turns a dependency into an optional peer: Vite 8 left
+  esbuild 0.27.7 (low advisory) in ProjectTrucks' lockfile, and `pnpm up --depth Infinity` /
+  `pnpm dedupe` didn't lift it (#3844).
 - Node image majors (`node:24-alpine` → `26-alpine`): Node 25+ no longer ships corepack, so a
   Dockerfile's `corepack enable` fails. CI that doesn't build the image stays green on the
   Dependabot PR. Install it first (`npm install -g corepack@<v> && corepack enable`) and build
