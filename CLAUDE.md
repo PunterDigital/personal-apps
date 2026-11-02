@@ -510,6 +510,13 @@ For each card in Triage:
   a plain read and lock by primary key. A MySQL-only test can hold the row on the test's
   connection and run the other side on a cloned connection with
   `innodb_lock_wait_timeout = 1` (Panel `ContractSigningTest`).
+- Playwright's `fill()` on a Filament search box right after a modal closes can lose the
+  text: Filament gives focus back to the opening button on a timer, and on a busy runner it
+  lands inside `fill()` (focus + select, then a separate Delete/insertText), so the keys go
+  to the button. `fill()` never checks the result. Retry `fill` + `toHaveValue` in
+  `expect(...).toPass()` (Panel `trials.spec.ts` `searchTable()`, #3832). Also,
+  `waitForLoadState('networkidle')` returns at once once the page has been idle a single
+  time, so it never waits for a Livewire request: wait on what the page shows.
 - A Filament page left in a background tab (a spec opened a second `browser.newPage()` for the
   client) never pulls its toast: `bringToFront()` before the next action whose toast you assert
   (Panel `organisation-approval.spec.ts`, #3536).
