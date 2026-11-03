@@ -591,6 +591,9 @@ For each card in Triage:
   ParaTest"): run the suite serially in a `run_in_background` Bash call (~5 min, 990 tests).
   A second card can be tested in a scratchpad worktree at the same time (own `composer install`,
   `npm ci`, copied `.env`, `npm run build`) while the first PR's CI runs (#3962/#4010, Nov 2).
+  Both checkouts' Playwright servers default to port 8124: give each its own `E2E_PORT`
+  (`tests/e2e/env.ts`), e.g. 8134 and 8144, and run only the related specs, one worker,
+  while the other side is installing or testing (#3966/#3967, Nov 3).
 - Panel uses `data-test` attributes, not `data-testid`: Playwright `getByTestId` finds nothing, use `locator('[data-test="x"]')`. A new Bash call falls back to PHP 8.3 unless the 8.4 `PATH` export is repeated (Panel #3082).
 - A new Filament navigation badge changes the sidebar link's accessible name ("Organisations" becomes
   "Organisations 3"), so every older spec with `getByRole('link', { name: 'Organisations', exact: true })`
