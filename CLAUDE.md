@@ -587,6 +587,10 @@ For each card in Triage:
   first. `getByRole('checkbox', { name })` matches the whole `<label>` text, so a label with a
   description span needs an `aria-label` on the input. A `page.goto` to a 403/404 logs a Chrome
   console error: assert `collectErrors()` before such visits (Panel #3080).
+- Panel has no ParaTest, so `php artisan test --parallel` fails at once (Collision "requires
+  ParaTest"): run the suite serially in a `run_in_background` Bash call (~5 min, 990 tests).
+  A second card can be tested in a scratchpad worktree at the same time (own `composer install`,
+  `npm ci`, copied `.env`, `npm run build`) while the first PR's CI runs (#3962/#4010, Nov 2).
 - Panel uses `data-test` attributes, not `data-testid`: Playwright `getByTestId` finds nothing, use `locator('[data-test="x"]')`. A new Bash call falls back to PHP 8.3 unless the 8.4 `PATH` export is repeated (Panel #3082).
 - A new Filament navigation badge changes the sidebar link's accessible name ("Organisations" becomes
   "Organisations 3"), so every older spec with `getByRole('link', { name: 'Organisations', exact: true })`
