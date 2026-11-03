@@ -729,6 +729,9 @@ that escapes backslashes (`'App\\Models'`) silently loses them (Panel #2788).
 For a multi-replace edit script, write the `.mjs` with the Write tool into the scratchpad and run
 it with `node <path>`: Write keeps every byte. Give it a `rep(a, b)` that throws when `a` isn't
 found, so a mangled pattern stops the script before it writes anything (Panel #2795).
+Inside `rep`, use `s.replace(a, () => b)`, not `s.replace(a, b)`: in a replacement string
+`` $` `` / `$&` / `$'` are special, so a template literal ending in `` ${id}$` `` (a regex
+anchor) pasted the whole file into the spec (Panel #3983).
 
 **Parallel branches in one repo.** While subagents edit the main checkout, a second card can go in a
 `git worktree add` under the scratchpad (never a top-level folder here: the next run would onboard it),
