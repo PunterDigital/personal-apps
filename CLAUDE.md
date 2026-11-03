@@ -602,6 +602,13 @@ For each card in Triage:
 - A new Filament form field whose label contains an existing one ("Public headline" next to "Headline") breaks
   every older spec that uses `getByRole('textbox', { name: 'Headline' })` (strict mode, 2 elements) but
   not the new spec: add `exact: true`, and grep `tests/e2e` for the old label before pushing (Panel #3087).
+- A required-field asterisk inside a `<label>` (even `aria-hidden`) breaks `getByLabel(name, { exact: true })`:
+  Playwright matches the label's text, asterisk included, though the accessible name is unchanged. Use
+  `getByRole('combobox', { name, exact: true })` (Panel `apply.spec.ts`, #3970). A Filament modal footer button
+  named "Close" clashes with the modal's corner X (also "Close"): scope it to `.fi-modal-footer`. A hidden
+  submit (`modalSubmitAction(false)`) doesn't stop `callAction()` or a crafted Livewire call, so the action
+  class must still refuse; `replaceMountedAction(name, context: ['schemaComponent' => 'infolist.<key>'])` in
+  an extra footer action swaps the dialog for a section's action (Panel #3972).
 - A long parallel Playwright run on this PC can end with `net::ERR_NO_BUFFER_SPACE` console
   errors (Windows socket exhaustion, ~10 min in). Rerun the failed specs alone before blaming
   the change (Panel #2801: 42/44, then 4/4).
