@@ -547,7 +547,9 @@ For each card in Triage:
   ids of every later record, and an older spec that depends on them broke (Panel `organisation-approval`
   failed with a Livewire entangle error until the seed moved, #3605).
 - After rebasing a branch, run `npm run build` again before E2E: a stale `public/build` from before
-  the rebase makes Playwright fail on UI that is already in the code.
+  the rebase makes Playwright fail on UI that is already in the code. But don't run the build while
+  PHPUnit runs in the same checkout: it replaces `public/build/manifest.json`, and a feature test that
+  renders a page at that moment fails (Panel #3981, a 9 s HireRequestContractorTest failure, 14/14 alone).
 - Error pages rendered from `withExceptions()->respond()`: an unmatched URL never runs the web
   middleware (no session, so a signed-in user looks like a guest), and a route-binding or CSRF
   error comes before `HandleInertiaRequests` (no shared props: the layout's `route()` and auth
