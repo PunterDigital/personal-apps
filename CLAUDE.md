@@ -601,6 +601,11 @@ For each card in Triage:
   "Organisations 3"), so every older spec with `getByRole('link', { name: 'Organisations', exact: true })`
   stops finding it: use a prefix regex (`/^Organisations/`). A taller view page also pushes the lazy
   relation managers off screen: `scrollIntoViewIfNeeded()` the tabpanel before asserting (Panel #3193).
+- A Filament button made `disabled()` with a `tooltip()` renders `aria-disabled="true"` (no
+  `disabled` attribute), and Playwright's `click()` waits on it until the test times out
+  (150 s, "element is not enabled"). Before pushing such a change, grep **all** of `tests/e2e`
+  for the button's name, without a `head` cutting the list short: Panel #3963's grep stopped at
+  40 lines and missed `signing.spec.ts`, which failed in CI.
 - A new Filament form field whose label contains an existing one ("Public headline" next to "Headline") breaks
   every older spec that uses `getByRole('textbox', { name: 'Headline' })` (strict mode, 2 elements) but
   not the new spec: add `exact: true`, and grep `tests/e2e` for the old label before pushing (Panel #3087).
