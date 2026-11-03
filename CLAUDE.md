@@ -727,6 +727,8 @@ found, so a mangled pattern stops the script before it writes anything (Panel #2
 `git worktree add` under the scratchpad (never a top-level folder here: the next run would onboard it),
 with its own `pnpm install`. `git worktree remove` fails on Windows with "Filename too long" in
 `node_modules`: delete the folder with `cmd /c rmdir /s /q "\\?\<path>"`, then `git worktree prune`.
+Run that from PowerShell: in Git Bash, MSYS rewrites `/s` and `/q` into paths ("Parameter format not
+correct") unless `MSYS2_ARG_CONV_EXCL='*'` is set (Panel #3980, Nov 3).
 
 **Stacking a branch on an open PR.** `gh pr merge --squash --delete-branch` also deletes the local
 branch, so `git rebase --onto main <old-branch>` fails afterwards. A squash keeps the same tree,
