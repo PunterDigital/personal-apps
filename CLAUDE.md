@@ -400,7 +400,14 @@ For each card in Triage:
   resolves it in one go, but `boost:update` (post-update-cmd) does not refresh the version labels in
   the CLAUDE.md `<laravel-boost-guidelines>` block: edit them by hand. Inertia 3 needs the config
   republished (`vendor:publish --provider="Inertia\ServiceProvider" --force`) and `<title inertia>`
-  -> `<title data-inertia>`. Pest 5 keeps collision on 8.x. Dependabot does not close PRs that a
+  -> `<title data-inertia>`. Pest 5 keeps collision on 8.x.
+  The republished v3 config defaults SSR **on**, comments out `bundle` and lowercases the pages
+  path (`js/pages`): re-apply the app's values. With SSR, the props move to a
+  `<script data-page="app" type="application/json">` and the root is
+  `<div data-server-rendered="true" id="app">`, so SSR specs that match `data-page="…"` on the div
+  need updating. A fallback `<title>` next to `@inertiaHead` gives SSR pages two titles (the
+  fallback first): wrap it in `<x-inertia::head>`, which prints its slot only without SSR. An
+  Inertia 2 SSR workaround (AniTrack's "[object Promise]") can go: v3 awaits the render (AniTrack #107/#109). Dependabot does not close PRs that a
   hand-rolled bump superseded: `gh pr close --delete-branch --comment` them after the merge.
 - A `composer update` can bump Pint (its constraint is loose) and bring new rules. `pint` then
   turns fully-qualified names into imports, and in `tests/Pest.php` it puts the `use` lines below
