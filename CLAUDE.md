@@ -689,7 +689,9 @@ it by port afterwards (`Get-NetTCPConnection -LocalPort <n>` → `Stop-Process`)
 then push a merge commit with that exact tree on top of the remote branch:
 `git commit-tree $(git rev-parse HEAD^{tree}) -p origin/<branch> -p main`.
 `gh pr merge` can answer "502 Bad Gateway" and leave the PR open (Panel #146, Nov 4): check
-`gh pr view <n> --json state` before moving on, and run the merge again.
+`gh pr view <n> --json state` before moving on, and run the merge again. `git push` can fail the
+same way ("remote rejected … (Internal Server Error)"); a `push -q … | tail` hides it and the
+next `gh pr create` fails with "Head sha can't be blank": push without `-q`, retry (Panel #149).
 After squash merges the old ancestry is gone, so `git merge main` into a sibling or stacked PR
 conflicts on files it never touched. Take the PR's own diff instead
 (`git diff $(git merge-base origin/main <branch>) origin/<branch>`, or against its old stacked base),
