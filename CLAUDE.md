@@ -688,6 +688,8 @@ it by port afterwards (`Get-NetTCPConnection -LocalPort <n>` → `Stop-Process`)
 **Updating a PR branch after another PR merged.** Don't force-push a rebase. Rebase locally and test,
 then push a merge commit with that exact tree on top of the remote branch:
 `git commit-tree $(git rev-parse HEAD^{tree}) -p origin/<branch> -p main`.
+`gh pr merge` can answer "502 Bad Gateway" and leave the PR open (Panel #146, Nov 4): check
+`gh pr view <n> --json state` before moving on, and run the merge again.
 After squash merges the old ancestry is gone, so `git merge main` into a sibling or stacked PR
 conflicts on files it never touched. Take the PR's own diff instead
 (`git diff $(git merge-base origin/main <branch>) origin/<branch>`, or against its old stacked base),
