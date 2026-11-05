@@ -738,6 +738,12 @@ focus and the states that need data (create a token, a playlist; switch flags on
 own service via `php artisan tinker` on the E2E database). Build the components from those
 numbers, capture again and diff the JSON: it finds what the eye misses (a missing
 `type="text"`, a variant only shown with data). Feature-flagged pages 404 in E2E until switched on.
+A styled theme also sets page-wide CSS: PrimeVue Aura's `.dark { color-scheme: dark }` kept the
+native date-picker icons light, and dropping the package dimmed them. Dump `html`/`body` computed
+styles (`color-scheme`, font) too, and diff full-page screenshots of main's build (built in a
+scratch worktree, copied over `public/build` for the capture) against the branch's (AniTrack #4272).
+Overlays (Select lists, dialogs) on an SSR app: `<Teleport v-if="mounted">` set in `onMounted`,
+so the server HTML and hydration agree.
 
 **Screenshots in PRs.** `gh` can't upload images. Commit them to an orphan `pr-assets` branch in the
 app repo (`git hash-object -w` → `git mktree` → `git commit-tree` → `git push origin <sha>:refs/heads/pr-assets`,
