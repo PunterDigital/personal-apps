@@ -361,6 +361,9 @@ For each card in Triage:
 - **GroundStation** (`groundstation/`) is the app this board and the GroundStation MCP connector
   run on. A merge to its `main` redeploys the pipeline's own board, so after every merge check
   the live site *and* that an MCP call still answers before carrying on with the run.
+  A workflow-only merge (e.g. a build-push-action bump) builds a byte-identical image
+  (`.github` is in `.dockerignore`), so `app.js`'s `Last-Modified` doesn't move: a green
+  Publish run plus a working MCP call is the check (#3838).
 
 **Docker-image web apps (Clerq)**
 - Release on a `v*` tag: build + push the GHCR image, POST the repo's `DEPLOY_WEBHOOK_URL`
@@ -498,6 +501,11 @@ For each card in Triage:
   major time: MDG's first Vite 8 / Tailwind 4 deploy took 14 minutes to appear (the run
   flagged it as failed at 12). Check again next run (or `curl` the CSS for `tailwindcss v4`)
   before flagging it to Shay (no Forge log access from here) (MDG #2881).
+  Dependabot's lone Vite 8 PR fails `npm ci` (ERESOLVE) while an old `@tailwindcss/vite`
+  (4.1.11's peer range stops at Vite 7) or laravel-vite-plugin 2 is in the lockfile: bump vite,
+  laravel-vite-plugin 3, @tailwindcss/vite
+  and @vitejs/plugin-vue in one PR. Vite 8 builds with rolldown, so an old
+  `@rollup/rollup-linux-x64-gnu` optional pin can go (Obsidian #3838; deployed in under a minute).
 - A Forge deploy that never goes live (webhook delivery 200 in `gh api repos/<repo>/hooks`, but the new
   route still 404 an hour later and the asset hash unchanged) needs Shay: there is no Forge log access
   from here. Flag it on the merged card and push-notify, and hold further merges to that app (open the
