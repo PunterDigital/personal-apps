@@ -707,6 +707,12 @@ then push a merge commit with that exact tree on top of the remote branch:
 `gh pr view <n> --json state` before moving on, and run the merge again. `git push` can fail the
 same way ("remote rejected … (Internal Server Error)"); a `push -q … | tail` hides it and the
 next `gh pr create` fails with "Head sha can't be blank": push without `-q`, retry (Panel #149).
+`gh pr create` can answer "GraphQL: Something went wrong" / 502 several times in a row and still
+create the PR on one of them: before each retry, `gh pr list --head <branch>` (Panel #162, Nov 5:
+five errors, one PR). The same afternoon a PR's run ended `startup_failure` ("likely failed because
+of a workflow file issue") with no workflow change, and the next push made no run at all: check
+`githubstatus.com/api/v2/components.json` (Actions "degraded_performance") before debugging the
+workflow, then push again once it recovers (Panel #164).
 After squash merges the old ancestry is gone, so `git merge main` into a sibling or stacked PR
 conflicts on files it never touched. Take the PR's own diff instead
 (`git diff $(git merge-base origin/main <branch>) origin/<branch>`, or against its old stacked base),
