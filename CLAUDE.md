@@ -546,6 +546,15 @@ For each card in Triage:
   `expect(...).toPass()` (Panel `trials.spec.ts` `searchTable()`, #3832). Also,
   `waitForLoadState('networkidle')` returns at once once the page has been idle a single
   time, so it never waits for a Livewire request: wait on what the page shows.
+- Filament form fields (Textarea and others) start their Alpine component lazily (`x-load`) and
+  only then `$entangle` `mountedActions.0.data.<field>`. A spec that submits a dialog before that
+  logs "Livewire Entangle Error … cannot be found" once the action is unmounted (console only,
+  the action works). Panel's `waitForLazyComponents(dialog)` in `fixtures.ts` waits for every
+  `[x-load]` element to have Alpine data (#4051).
+- This PC runs Panel E2E ~4x slower than CI (each `artisan serve` request is a new PHP process):
+  a spec that takes 14 s in CI took 60 s here. A local-only timeout on whatever step came last
+  is the spec's `timeout` budget, not that step: compare the trace's test start with the
+  failure time before debugging the step (#4092).
 - A Filament page left in a background tab (a spec opened a second `browser.newPage()` for the
   client) never pulls its toast: `bringToFront()` before the next action whose toast you assert
   (Panel `organisation-approval.spec.ts`, #3536).
@@ -721,6 +730,14 @@ with parents `origin/<branch>` and `origin/main` (Panel #61/#62, Oct 26).
 Panel's E2ESeeder, `tests/e2e/fixtures.ts`, `routes/console.php` and CLAUDE.md conflict on every
 parallel card, always additively. `node scripts/union-merge.mjs <files>` (keep both sides, ours
 first) handles most of it, but check each seam: when both sides end just before a shared `}` the result loses a brace.
+
+**Swapping a UI library for local components** (AniTrack #4272): before touching code, run a
+throwaway Playwright spec on main's build that takes full-page screenshots and dumps
+`getComputedStyle` (box, padding, border, colours, font, shadow) of every control, plus hover,
+focus and the states that need data (create a token, a playlist; switch flags on with the app's
+own service via `php artisan tinker` on the E2E database). Build the components from those
+numbers, capture again and diff the JSON: it finds what the eye misses (a missing
+`type="text"`, a variant only shown with data). Feature-flagged pages 404 in E2E until switched on.
 
 **Screenshots in PRs.** `gh` can't upload images. Commit them to an orphan `pr-assets` branch in the
 app repo (`git hash-object -w` → `git mktree` → `git commit-tree` → `git push origin <sha>:refs/heads/pr-assets`,
