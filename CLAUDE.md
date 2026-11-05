@@ -852,6 +852,15 @@ not picked up by the build step, and it moves to Done once all its pieces are re
   Dockerfile's `corepack enable` fails. CI that doesn't build the image stays green on the
   Dependabot PR. Install it first (`npm install -g corepack@<v> && corepack enable`) and build
   the image locally before merging (Clerq #3273).
+- Check a major's licence before merging, even with green CI: `npm view <pkg>@<v> license`
+  (and the tarball's LICENSE). PrimeVue 5 went from MIT to a commercial PrimeUI licence that
+  needs a key (`@primeui/license-manager` dependency); a licence change is Shay's call (AniTrack #4252).
+- TypeScript 7 (the native compiler) has no JS compiler API, so `vue-tsc` can't run on it
+  ("typescript/lib/tsc" not exported). Projects with vue-tsc stay on TS 6.0 (the last JS release)
+  with a Dependabot `ignore: typescript >=7` (AniTrack extension, #3820).
+- Inertia 3 on an app with no published `config/inertia.php`: the package default turns SSR on
+  and points page checks at lowercase `js/pages`, which can break `assertInertia()->component()`
+  on Linux CI (unless the test passes `false` to skip the file check). Publish the config and set both (MDG #3821).
 - If a run's log entry is missing, reconstruct what it did from `gh release list`, open `claude/*`
   PRs and the board's latest `🤖 Claude:` comments before carrying on (the Oct 26 00:xx train
   released five apps, opened three PRs and logged nothing).
