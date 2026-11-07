@@ -744,6 +744,10 @@ styles (`color-scheme`, font) too, and diff full-page screenshots of main's buil
 scratch worktree, copied over `public/build` for the capture) against the branch's (AniTrack #4272).
 Overlays (Select lists, dialogs) on an SSR app: `<Teleport v-if="mounted">` set in `onMounted`,
 so the server HTML and hydration agree.
+Stack the teleported layers on purpose: a Select list at z 1001 opened *under* the Dialog mask
+(1101), so the Status dropdown in a dialog showed nothing, while keyboard-only E2E still passed.
+Pick options with a mouse `click()` inside dialogs too: Playwright refuses a covered element
+("… intercepts pointer events") (AniTrack #4329).
 
 **Screenshots in PRs.** `gh` can't upload images. Commit them to an orphan `pr-assets` branch in the
 app repo (`git hash-object -w` → `git mktree` → `git commit-tree` → `git push origin <sha>:refs/heads/pr-assets`,
