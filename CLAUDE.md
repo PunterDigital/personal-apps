@@ -364,6 +364,10 @@ For each card in Triage:
   A workflow-only merge (e.g. a build-push-action bump) builds a byte-identical image
   (`.github` is in `.dockerignore`), so `app.js`'s `Last-Modified` doesn't move: a green
   Publish run plus a working MCP call is the check (#3838).
+  If the site answers Easypanel's 502 page (hexagon logo) with no recent deploy while Clerq on the
+  same host is up, the service container is down: `gh run rerun` the last Publish run on `main`
+  redeploys the same commit (back in ~2 min, Nov 8). The MCP connector still failed for the
+  rest of that run afterwards (connector status "connected"), so expect a run with no board.
 
 **Docker-image web apps (Clerq)**
 - Release on a `v*` tag: build + push the GHCR image, POST the repo's `DEPLOY_WEBHOOK_URL`
