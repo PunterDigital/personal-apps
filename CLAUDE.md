@@ -296,8 +296,11 @@ For each card in Triage:
 - Auto-update can be tested for real without touching Shay's install: package with
   `-c.extraMetadata.version=<older>` and run it with a test profile plus the app's opt-in env
   (Nexus: `NEXUS_UPDATE_IN_TEST_PROFILE=1`). It downloads the current release. Never click
-  "Restart to update". Afterwards delete only `%LOCALAPPDATA%/<app>-updater/pending`: the folder
-  itself holds `installer.exe` from Shay's real install (NSIS keeps it, even for `publish: null` apps).
+  "Restart to update". Shay's real install can have its own download waiting in
+  `%LOCALAPPDATA%/<app>-updater/pending` (Nexus had 0.3.1 there on Nov 9), so don't share that
+  folder: set `updaterCacheDirName: <app>-updater-test<card>` in the test build's
+  `win-unpacked/resources/app-update.yml` and delete that folder afterwards (Nexus #4351). The real
+  folder also holds `installer.exe` from his install (NSIS keeps it, even for `publish: null` apps).
   Build the NSIS target, not `--dir` (no `resources/app-update.yml`). For a local feed, edit
   `win-unpacked/resources/app-update.yml` by hand (`provider: generic`, `url:`); a
   `-c.publish.provider=generic` override fails the schema when the yml sets owner/repo (Finance #3353).
