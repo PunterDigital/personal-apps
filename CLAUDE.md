@@ -56,6 +56,12 @@ source of truth for *how* work is done. Update it when the process changes.
 | Awaiting Release | 30 | Merged to `main`; ships in the next release |
 | Done | 27 | Released; final comment has version + download link |
 
+**Shay's own tasks.** Work only Shay can do (a Forge/Documenso setting, a run that a scheduled
+session isn't allowed to make) goes on a card **assigned to Shay** (member id 1), in Ready, without
+the `claude` tag, with numbered steps in the description or a `🤖 Claude:` comment (Shay asked for
+this on #3446, Nov 9: "make separate tickets and assign them to myself"). The build step skips
+these cards. When Shay comments that it's done, check what you can and move it on.
+
 **Tags.** Project tags (lowercase, e.g. `nexus ssh`) map to `projects.json[].tag`. Status tags Claude
 manages: `claude` (Claude owns it), `needs answer` (question pending for Shay), `blocked` (Claude
 cannot proceed — reason in comments), `bug`, `hotfix` (ship immediately), `size: s|m|l`,
@@ -113,7 +119,7 @@ Runs every 2 hours, 09:00–23:00 local, plus 00:00 (scheduled task `personal-ap
    Read the full comment thread of any card before you build, merge or release it, and act on any
    un-prefixed comment newer than Claude's last one.
 5. **Triage.** Every card in *Triage* (see **Triage rules**).
-6. **Build.** Take the top card from *Ready*: `hotfix` / `priority: critical` > `high` > `medium` >
+6. **Build.** Take the top `claude` card from *Ready* (cards assigned to Shay are his tasks): `hotfix` / `priority: critical` > `high` > `medium` >
    `low`; within the same priority, `bug` > due date > oldest. Run the
    **Feature workflow**. Do up to 2 cards per run if time allows; never leave a card half-done without
    a comment saying where it stands.
@@ -373,6 +379,9 @@ For each card in Triage:
   same host is up, the service container is down: `gh run rerun` the last Publish run on `main`
   redeploys the same commit (back in ~2 min, Nov 8). The MCP connector still failed for the
   rest of that run afterwards (connector status "connected"), so expect a run with no board.
+  When GroundStation **and** Clerq both time out (curl `000`, or a 504) while other sites answer,
+  the Easypanel host itself is down: a Publish rerun can't help. Nov 9 18:30 UTC it came back by
+  itself after ~15 minutes and the MCP connector worked again at once. Wait, don't redeploy.
 
 **Docker-image web apps (Clerq)**
 - Release on a `v*` tag: build + push the GHCR image, POST the repo's `DEPLOY_WEBHOOK_URL`
@@ -738,7 +747,9 @@ create the PR on one of them: before each retry, `gh pr list --head <branch>` (P
 five errors, one PR). The same afternoon a PR's run ended `startup_failure` ("likely failed because
 of a workflow file issue") with no workflow change, and the next push made no run at all: check
 `githubstatus.com/api/v2/components.json` (Actions "degraded_performance") before debugging the
-workflow, then push again once it recovers (Panel #164).
+workflow, then push again once it recovers (Panel #164). Nov 9 (Actions "major_outage"): the
+self-hosted runner's PRs (Panel #178/#179) ended "workflow file issue" with zero jobs while
+GitHub-hosted AniTrack CI passed; `gh run rerun <id>` once Actions was "operational" ran them fine.
 After squash merges the old ancestry is gone, so `git merge main` into a sibling or stacked PR
 conflicts on files it never touched. Take the PR's own diff instead
 (`git diff $(git merge-base origin/main <branch>) origin/<branch>`, or against its old stacked base),
