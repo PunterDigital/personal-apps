@@ -332,7 +332,9 @@ For each card in Triage:
   `tauri-action` with the same `tagName` uploads to it from each OS. Finish with an asset-check job.
   tauri-action v1 updates the name and body of an existing release from its inputs (empty body =
   notes wiped): export the generated notes as a job output and pass them as `releaseBody`
-  (ProjectTrucks `release.yml`).
+  (ProjectTrucks `release.yml`). For hand-written notes, run
+  `gh release create vX --target <merge sha> --notes-file …` instead of pushing the tag. It
+  creates the tag, the workflow sees that the release exists and passes its body on (v0.6.1).
 - Self-update without Tauri's updater plugin (no signing key): download the `_x64-setup.exe`,
   check GitHub's asset `digest` (`sha256:…`, on every release asset), run it with `/P /R /UPDATE`
   (passive, relaunch, keep removed shortcuts removed) and exit. To test: build an older version
@@ -629,6 +631,11 @@ For each card in Triage:
   "Organisations 3"), so every older spec with `getByRole('link', { name: 'Organisations', exact: true })`
   stops finding it: use a prefix regex (`/^Organisations/`). A taller view page also pushes the lazy
   relation managers off screen: `scrollIntoViewIfNeeded()` the tabpanel before asserting (Panel #3193).
+- Filament 5.11+ draws a required single-choice `ToggleButtons` as hidden radios with styled
+  labels. `getByRole('button', { name })` finds nothing, and `check()` fails because the label
+  intercepts the click. Click the label and assert `toBeChecked()` (Panel `chooseToggle()`, #177).
+  Dependabot's lone vite-plus PR bumps only `vite-plus`, not the `vite` alias or `overrides.vite`,
+  so it always fails `npm ci`: fold it into the combined deps branch.
 - A Filament button made `disabled()` with a `tooltip()` renders `aria-disabled="true"` (no
   `disabled` attribute), and Playwright's `click()` waits on it until the test times out
   (150 s, "element is not enabled"). Before pushing such a change, grep **all** of `tests/e2e`
@@ -671,6 +678,9 @@ For each card in Triage:
   `settings put global hide_error_dialogs 1` and force-stop `com.google.android.apps.nexuslauncher`.
   On failure, dump `mCurrentFocus`, ANRs/crashes from logcat, and a screenshot (World Explorer `ci.yml`).
   `android-emulator-runner` runs each `script:` line on its own, so a `|| { …; }` block must stay on one line.
+  A second cold-emulator flake: `com.google.android.gms.persistent` ANRs and `setMockMode` fails
+  with "Timed out waiting for Task" (`MainActivityE2ETest`). Check for it in the `e2e-reports`
+  artifact and rerun once before you debug (#26, Nov 9). If it comes back, open a card.
 - Reproducing boot/reboot bugs: the Gradle managed device can't be rebooted, so copy its
   `config.ini` (`~/.android/avd/gradle-managed/...`) into a scratch AVD dir, drop the
   `disk.dataPartition.path = <temp>` and `fastboot.*` lines, and boot it with `ANDROID_AVD_HOME`
@@ -922,6 +932,18 @@ not picked up by the build step, and it moves to Done once all its pieces are re
   in the parent finished ten projects in ~80 minutes. Expect macOS hosted runners to queue 10–15
   min when several apps release at once, and local E2E to time out on logins while the agents
   build: rerun alone or trust CI.
+  Nov 9: seven agents (Panel deps as one of them) took ~45 min. Agents hand back while their
+  release workflow still runs (a sub-agent's foreground wait goes to the background after
+  ~3 min). So the parent `gh run watch`es the run itself (`run_in_background`) and checks the
+  assets before it moves any card. Tell agents to wait with `run_in_background` or Monitor.
+- A Dependabot "dev" group that bumps `electron` changes the shipped runtime, so it gets a patch
+  release (Finance v0.6.1).
+- On every repo, put all open patch/minor Dependabot PRs into one `chore(deps)` branch (in-range
+  `composer update -W` / `npm update`), not one merge each. That gives one CI run and, on Forge or
+  Publish apps, one production deploy, and Dependabot closes the old PRs by itself
+  (Obsidian #54, GroundStation #105, Nov 9).
+- AniTrack's `git fetch --tags` exits 1 ("would clobber existing tag"), because the
+  extension dev build moves `extension-dev-latest`. Use `--force`.
 - A crashed run leaves `ops/run.lock` and possibly uncommitted work on a `claude/*` branch. When
   the lock is stale and no session is running, take the lock, `git add -A && git commit` the WIP on
   that branch before any other git command, then finish the card from there (Panel #3600, Nov 2).
