@@ -171,16 +171,18 @@ For each card in Triage:
 6. Wait for checks (poll `gh pr checks --watch` with a sensible timeout). Fix failures.
 7. Green → `gh pr merge --squash --delete-branch`. Move card to *Awaiting Release*, comment with PR link.
    If checks are still running when the run must end, leave the card in Testing & CI (step 3 next run).
-   **PunterDigital Panel is the exception:** a merge to `main` *is* its release (Forge deploys it).
-   Once the deploy is confirmed live, move the card straight to *Done* with
-   `🤖 Claude: Released (live on https://panel.punterdigital.com) — <PR URL>.` It never waits in
-   Awaiting Release, and the Monday train doesn't tag Panel (Shay, Nov 2).
+   **PunterDigital Panel and AniTrack are the exceptions:** a merge to `main` *is* their release
+   (Forge deploys it). Once the deploy is confirmed live, move the card straight to *Done* with
+   `🤖 Claude: Released (live on <webUrl>) — <PR URL>.` They never wait in Awaiting Release, and
+   the Monday train doesn't tag them (Shay: Panel Nov 2, AniTrack Nov 10). AniTrack's Chrome
+   extension (`chrome-extension/`) isn't covered: a merge only refreshes the `extension-dev-latest`
+   pre-release, and a stable build still needs an `extension-v*` tag.
 
 ## Release cadence
 
 - **Weekly release train:** the first run on **Monday** releases every project that has cards in
-  *Awaiting Release* (or other unreleased commits on `main`). Not Panel: its merges are its
-  releases (see Feature workflow step 7).
+  *Awaiting Release* (or other unreleased commits on `main`). Not Panel or AniTrack: their
+  merges are their releases (see Feature workflow step 7).
 - **Hotfix:** cards tagged `hotfix` or `priority: critical`, or `bug`s that stop the app launching /
   lose data / are security issues (tag those `priority: critical`) → release immediately after merge.
 - **First release:** a newly onboarded project gets a release as soon as its pipelines are green.
