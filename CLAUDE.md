@@ -675,6 +675,12 @@ For each card in Triage:
   15 s. Filament `assertActionHidden(TestAction::make(x)->table($record))` fails with "Record [n]
   no longer exists" when the active tab's query leaves the record out: assert on a tab that
   includes it (Panel #3203).
+- Blade compiles directives before echoes, even inside `{!! !!}`: a JSON-LD key `'@context'` there
+  became Laravel's `@context` directive, so the live page source showed `<?php $__contextArgs…`
+  (AniTrack #4456). Write `'@@context'`, and grep root views for `'@` keys in other apps.
+- `/version` pages (#4445): MDG's `App\Support\DeployedVersion` reads `.git` with plain file reads
+  (Forge pulls `main` in place); the route uses `->withoutMiddleware('web')` so it sets no cookie.
+  Copy both to the other Forge apps.
 - `cmd && tail` reports tail's exit code, so a failed `npm run check` piped into tail still let a
   push go ahead. Run checks on their own (or `set -o pipefail`) before pushing (Panel #3203).
 
