@@ -692,7 +692,8 @@ For each card in Triage:
   (AniTrack #4456). Write `'@@context'`, and grep root views for `'@` keys in other apps.
 - `/version` pages (#4445): MDG's `App\Support\DeployedVersion` reads `.git` with plain file reads
   (Forge pulls `main` in place); the route uses `->withoutMiddleware('web')` so it sets no cookie.
-  Copy both to the other Forge apps.
+  Copy both to the other Forge apps. Now live on MDG, mcpacks, Panel and AniTrack; AniTrack's
+  zero-downtime release folders keep `.git`, so it works there too (#4453).
 - `cmd && tail` reports tail's exit code, so a failed `npm run check` piped into tail still let a
   push go ahead. Run checks on their own (or `set -o pipefail`) before pushing (Panel #3203).
 
