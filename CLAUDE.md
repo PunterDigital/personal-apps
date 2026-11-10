@@ -425,7 +425,12 @@ For each card in Triage:
   resolves it in one go, but `boost:update` (post-update-cmd) does not refresh the version labels in
   the CLAUDE.md `<laravel-boost-guidelines>` block: edit them by hand. Inertia 3 needs the config
   republished (`vendor:publish --provider="Inertia\ServiceProvider" --force`) and `<title inertia>`
-  -> `<title data-inertia>`. Pest 5 keeps collision on 8.x.
+  -> `<title data-inertia>`. Pest 5 keeps collision on 8.x. Pest 5 brings PHPUnit 13, which warns
+  when a `#[DataProvider]` row has more values than the test takes: add the parameter (AniTrack
+  #4441). An app config file without `serializable_classes` keeps cached objects working (the
+  framework's base `cache.php` has no such key, so it stays `null`), and a config that already
+  uses the hyphen prefixes (`-session`, `-cache-`) keeps its cookie name: check both before
+  merging, or everyone gets signed out.
   The republished v3 config defaults SSR **on**, comments out `bundle` and lowercases the pages
   path (`js/pages`): re-apply the app's values. With SSR, the props move to a
   `<script data-page="app" type="application/json">` and the root is
