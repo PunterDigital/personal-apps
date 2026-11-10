@@ -675,6 +675,13 @@ For each card in Triage:
   15 s. Filament `assertActionHidden(TestAction::make(x)->table($record))` fails with "Record [n]
   no longer exists" when the active tab's query leaves the record out: assert on a tab that
   includes it (Panel #3203).
+- Inertia SSR with a non-default port (AniTrack: 13721): `inertia:start-ssr` passes only its own
+  process env to Node, and with the config cached (Forge deploys) Laravel never loads `.env`. So
+  `INERTIA_SSR_PORT` never reaches `ssr.js`, Node listens on 13714 while Laravel calls the cached
+  13721, and every page silently falls back to an empty `#app`; `inertia:stop-ssr` misses it too.
+  The Forge daemon command sets it: `/usr/bin/env INERTIA_SSR_PORT=13721 php8.4 artisan
+  inertia:start-ssr`. The daemon log (`~/.forge/daemon-<id>.log`) prints the port. With
+  zero-downtime deploys `stop-ssr` must come after `$ACTIVATE_RELEASE()` (AniTrack #4272, Nov 10).
 - Blade compiles directives before echoes, even inside `{!! !!}`: a JSON-LD key `'@context'` there
   became Laravel's `@context` directive, so the live page source showed `<?php $__contextArgs…`
   (AniTrack #4456). Write `'@@context'`, and grep root views for `'@` keys in other apps.
