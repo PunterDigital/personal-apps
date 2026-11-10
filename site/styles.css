@@ -7,6 +7,7 @@
   --accent: #1b6fd1;
   --accent-text: #ffffff;
   --btn: #f0f0ec;
+  --live: #1a7f37;
   color-scheme: light;
 }
 @media (prefers-color-scheme: dark) {
@@ -19,6 +20,7 @@
     --accent: #4c94ea;
     --accent-text: #0d1117;
     --btn: #26282c;
+    --live: #3fb950;
     color-scheme: dark;
   }
 }
@@ -48,6 +50,8 @@ h1 { font-size: 28px; margin: 0 0 4px; letter-spacing: -0.01em; }
 .meta { margin: 0; color: var(--muted); font-size: 14px; }
 .version { font-variant-numeric: tabular-nums; font-weight: 600; color: var(--text); }
 .version.muted { color: var(--muted); font-weight: 400; }
+.version.live { color: var(--live); }
+.version.live::before { content: ''; display: inline-block; width: 8px; height: 8px; margin-right: 6px; border-radius: 50%; background: currentColor; vertical-align: 1px; }
 .desc { margin: 8px 0 16px; }
 
 .downloads { display: flex; flex-wrap: wrap; gap: 8px; }

@@ -62,9 +62,14 @@ function downloadsFor(project, release) {
   return links;
 }
 
+// Forge-hosted web apps deploy every merge to main, so they have no version to show.
+const isLive = (project) => project.hosting === 'forge';
+
 function renderProject(project, release) {
   const links = downloadsFor(project, release);
-  const version = project.private
+  const version = isLive(project)
+    ? '<span class="version live">Live</span>'
+    : project.private
     ? '<span class="version muted">Web app</span>'
     : release
     ? `<span class="version">${esc(release.tag_name)}</span> · <time datetime="${esc(release.published_at)}">${new Date(release.published_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</time>`
@@ -98,8 +103,8 @@ const projects = registry.projects.filter((p) => p.status !== 'hidden');
 const sections = [];
 for (const project of projects) {
   // A private repo's releases aren't visible to the Pages workflow's token, and
-  // its source and release links would 404 for visitors.
-  const release = project.private ? null : await latestRelease(project.repo);
+  // its source and release links would 404 for visitors. Live apps' old tags are stale.
+  const release = project.private || isLive(project) ? null : await latestRelease(project.repo);
   sections.push(renderProject(project, release));
 }
 

@@ -175,7 +175,8 @@ For each card in Triage:
    to `main` *is* their release (Forge deploys it). Once the deploy is confirmed live, move the card
    straight to *Done* with `🤖 Claude: Released (live on <webUrl>) — <PR URL>.` They never wait in
    Awaiting Release, and the Monday train doesn't tag them (Shay: Panel Nov 2, all Forge apps
-   Nov 10). GroundStation (Easypanel) and Clerq (deploys on a tag) stay on the train. AniTrack's Chrome
+   Nov 10). Their registry entry has `hosting: "forge"`, so the downloads page shows "Live"
+   instead of a stale tag. GroundStation (Easypanel) and Clerq (deploys on a tag) stay on the train. AniTrack's Chrome
    extension (`chrome-extension/`) isn't covered: a merge only refreshes the `extension-dev-latest`
    pre-release, and a stable build still needs an `extension-v*` tag.
 

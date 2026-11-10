@@ -30,6 +30,7 @@
         "web"
       ],
       "webUrl": "https://mymilliondollargrid.com/",
+      "hosting": "forge",
       "status": "active"
     },
     {
@@ -93,6 +94,7 @@
         "web"
       ],
       "webUrl": "https://mcpacks.dev/",
+      "hosting": "forge",
       "private": true,
       "status": "active"
     },
@@ -134,6 +136,7 @@
         "web"
       ],
       "webUrl": "https://panel.punterdigital.com/",
+      "hosting": "forge",
       "private": true,
       "status": "hidden"
     },
@@ -148,6 +151,7 @@
         "web"
       ],
       "webUrl": "https://anitrack.app/",
+      "hosting": "forge",
       "status": "active"
     }
   ]
