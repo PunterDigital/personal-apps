@@ -376,9 +376,9 @@ For each card in Triage:
 - **GroundStation** (`groundstation/`) is the app this board and the GroundStation MCP connector
   run on. A merge to its `main` redeploys the pipeline's own board, so after every merge check
   the live site *and* that an MCP call still answers before carrying on with the run.
-  A workflow-only merge (e.g. a build-push-action bump) builds a byte-identical image
-  (`.github` is in `.dockerignore`), so `app.js`'s `Last-Modified` doesn't move: a green
-  Publish run plus a working MCP call is the check (#3838).
+  Check the deploy with `curl https://app.groundstationhq.com/version`: its `commit` is the
+  Publish run's `github.sha` (a build arg, #4454), so it moves on every merge, workflow-only
+  ones included (`app.js`'s `Last-Modified` doesn't, #3838). Plus a working MCP call.
   If the site answers Easypanel's 502 page (hexagon logo) with no recent deploy while Clerq on the
   same host is up, the service container is down: `gh run rerun` the last Publish run on `main`
   redeploys the same commit (back in ~2 min, Nov 8). The MCP connector still failed for the
@@ -926,8 +926,7 @@ not picked up by the build step, and it moves to Done once all its pieces are re
   the clock. And overflowing `addMonths` isn't monotonic (Aug 31 + 6 = Mar 3, Sep 1 + 6 = Mar 1):
   a shown date from `addMonths` with a cleanup cutoff from `subMonths` deleted packs before
   their shown date. Use NoOverflow on both sides.
-- Deploys without a hashed asset: GroundStation's `/public/js/app.js` `Last-Modified` is the image
-  build time; for a Forge app whose bump leaves the hash unchanged, `/build/manifest.json`'s
+- Deploys without a hashed asset: GroundStation's `/version` commit (#4454); for a Forge app whose bump leaves the hash unchanged, `/build/manifest.json`'s
   `Last-Modified` still moves (MDG, Nov 2).
 - Check the last CI run on each `main` is green; investigate red.
 - `npm audit` (or equivalent) — high/critical findings become `bug` cards.
