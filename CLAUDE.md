@@ -592,11 +592,19 @@ For each card in Triage:
   it fails ("hidden") even while it's open. Assert its heading. A click on a section action before
   Livewire has loaded opens nothing: wait for the page to settle, or retry the click until the
   heading shows (Panel `rate-four-eyes.spec.ts`, #3650).
-- Laragear WebAuthn (passkeys) in Pest without an authenticator: bind a subclass of
-  `Laragear\WebAuthn\Http\Requests\AssertedRequest` in the container with `rules()` = `[]` and a
-  `login()` that calls `Auth::login($user)`, then test what the controller does after the check
-  (AniTrack #3877). Playwright's `page.url()` right after clicking an Inertia link can still be the
-  old URL: wait for something on the new page first.
+- Passkeys: AniTrack moved from laragear/webauthn (abandoned) to laravel/passkeys (#4237).
+  Pest needs no fakes: AniTrack's `tests/Support/SoftwareAuthenticator.php` signs real ES256/RS256
+  assertions (Windows PHP's `openssl_pkey_new` needs `config` => `<php>/extras/ssl/openssl.cnf`;
+  no ext-sodium here, so Ed25519 code only ever runs in CI). laravel/passkeys 0.3 verifies
+  ES256/RS256 only: an EdDSA key gives a 500 ("Unsupported algorithm"). Its `user` relation
+  hides soft-deleted users and its `PasskeyVerified` event then gets null (500): use a
+  `withTrashed()` model. Browser E2E: CDP virtual authenticator on `http://localhost` (WebAuthn
+  refuses an IP as RP ID); `WebAuthn.addCredential` with a known PKCS#8 key tests a seeded or
+  migrated credential. To prove a credential migration, register on `main` with a virtual
+  authenticator, save `WebAuthn.getCredentials` and the DB, migrate on the branch, and sign in
+  with the saved credential. A rate limiter `->by($request->input('email'))` puts every
+  email-less request (passkeys) in one site-wide bucket. Playwright's `page.url()` right after
+  clicking an Inertia link can still be the old URL: wait for something on the new page first.
 - Add new E2E seed data at the **end** of an `E2ESeeder`: a new organisation seeded mid-file shifts the
   ids of every later record, and an older spec that depends on them broke (Panel `organisation-approval`
   failed with a Livewire entangle error until the seed moved, #3605).
