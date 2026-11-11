@@ -700,6 +700,12 @@ For each card in Triage:
   (Forge pulls `main` in place); the route uses `->withoutMiddleware('web')` so it sets no cookie.
   Copy both to the other Forge apps. Now live on MDG, mcpacks, Panel and AniTrack; AniTrack's
   zero-downtime release folders keep `.git`, so it works there too (#4453).
+- Sentry issues can arrive as Triage cards ("Sentry Error ANITRACK-1J", body = the Sentry
+  page, too big for `get_card`'s output: parse the saved file with Node). Before merging more
+  to that app, compare the issue's first-seen time with the last deploys' `/version`
+  `deployed_at`. An `Anime::upsert` (any Eloquent `upsert`/query update) skips model events, so
+  anything a `saving` hook fills (AniTrack slugs) stays empty: backfill after the upsert, and
+  seed such rows in E2E with a query update (AniTrack #4505).
 - `cmd && tail` reports tail's exit code, so a failed `npm run check` piped into tail still let a
   push go ahead. Run checks on their own (or `set -o pipefail`) before pushing (Panel #3203).
 
