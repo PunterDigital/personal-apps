@@ -501,7 +501,10 @@ For each card in Triage:
 - Laravel 13's CSRF middleware is `PreventRequestForgery`, not `ValidateCsrfToken`:
   `->withoutMiddleware(ValidateCsrfToken::class)` on a webhook route does nothing (419). Exclude
   the path with `$middleware->preventRequestForgery(except: [...])` in `bootstrap/app.php`. PHPUnit
-  skips CSRF, so only E2E (or a real caller) catches it (Panel #2799).
+  skips CSRF, so only E2E (or a real caller) catches it (Panel #2799). A browser-driven E2E
+  can miss it too: Chrome's form POST sends `Sec-Fetch-Site: same-origin`, which
+  `PreventRequestForgery` accepts without a token. Test with Playwright's `request` fixture
+  (no such header, like curl or a bot) (AniTrack #4488).
 - Documenso (self-hosted e-signature, Panel `App\Signing`): complete a contract only on
   `DOCUMENT_COMPLETED`. The last signer's `DOCUMENT_SIGNED` already shows everyone signed, but the
   PDF is sealed after it, and `download?version=signed` returns the original until then. It
@@ -647,6 +650,9 @@ For each card in Triage:
   Both checkouts' Playwright servers default to port 8124: give each its own `E2E_PORT`
   (`tests/e2e/env.ts`), e.g. 8134 and 8144, and run only the related specs, one worker,
   while the other side is installing or testing (#3966/#3967, Nov 3).
+  AniTrack's E2E has `E2E_PORT` / `E2E_DB` too, but its gtag and SSR servers keep their SQLite
+  files in `os.tmpdir()/anitrack-e2e/` whatever `E2E_DB` says: a second checkout's run sets
+  `TEMP`/`TMP` to its own scratch folder, or the two reset each other's databases (#4488).
 - Panel uses `data-test` attributes, not `data-testid`: Playwright `getByTestId` finds nothing, use `locator('[data-test="x"]')`. A new Bash call falls back to PHP 8.3 unless the 8.4 `PATH` export is repeated (Panel #3082).
 - A new Filament navigation badge changes the sidebar link's accessible name ("Organisations" becomes
   "Organisations 3"), so every older spec with `getByRole('link', { name: 'Organisations', exact: true })`
