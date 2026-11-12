@@ -383,6 +383,8 @@ For each card in Triage:
   same host is up, the service container is down: `gh run rerun` the last Publish run on `main`
   redeploys the same commit (back in ~2 min, Nov 8). The MCP connector still failed for the
   rest of that run afterwards (connector status "connected"), so expect a run with no board.
+  Nov 12 (down between the 19:03 and 21:03 runs) the same rerun brought it back in ~3 min and
+  the connector answered straight away, so retry the board once after `/version` returns 200.
   When GroundStation **and** Clerq both time out (curl `000`, or a 504) while other sites answer,
   the Easypanel host itself is down: a Publish rerun can't help. Nov 9 18:30 UTC it came back by
   itself after ~15 minutes and the MCP connector worked again at once. Wait, don't redeploy.
