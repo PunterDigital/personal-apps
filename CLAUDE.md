@@ -68,7 +68,8 @@ these cards. When Shay comments that it's done, check what you can and move it o
 **Tags.** Project tags (lowercase, e.g. `nexus ssh`) map to `projects.json[].tag`. Status tags Claude
 manages: `claude` (Claude owns it), `needs answer` (question pending for Shay), `blocked` (Claude
 cannot proceed — reason in comments), `bug`, `hotfix` (ship immediately), `size: s|m|l`,
-`priority: low|medium|high|critical`.
+`priority: low|medium|high|critical`. Shay's own: `upstream` (id 38) on a fork's card (Arkeep)
+sends that change upstream as a PR too (see **Forks of upstream projects**).
 Create tags on the fly with `add_card_tag` by name.
 
 **Priority.** Every triaged card carries exactly one `priority:` tag:
@@ -386,7 +387,15 @@ For each card in Triage:
   with `upstream` (recipe in Arkeep's `CLAUDE.md`).
 - Public fork = GitHub-hosted runners only, even if Shay asks for the self-hosted one (he agreed
   once the fork-PR risk was explained, Nov 13). A fork of a public repo can't be made private.
-- Contributions upstream are public under Shay's name: ask before opening one.
+- **The `upstream` tag decides where a change goes** (Shay, Nov 13). A card tagged `upstream`
+  is built for upstream: a branch from the upstream branch they take PRs on (Arkeep: `develop`),
+  following their CONTRIBUTING.md, opened as a PR against the upstream repo. The tag is Shay's
+  OK to open that public PR under his name. We also carry it in our build (cherry-pick onto our
+  `main` via our own PR, a `PATCHES.md` row with the upstream PR link) until an upstream release
+  includes it; the sync that brings it in drops the row. A card **without** the tag is a
+  fork-only patch: never offer it upstream unasked. Claude may suggest the tag in a triage
+  comment but doesn't add it; only Shay does. An `upstream` card isn't Done until our build ships
+  it; the upstream PR's fate goes in a comment (merged, changes asked, closed).
 
 **Private repos (free plan)**
 - No branch protection or rulesets (needs GitHub Pro): there are no required checks, so confirm CI
