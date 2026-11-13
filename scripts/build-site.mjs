@@ -14,7 +14,7 @@ const DEFAULT_ASSETS = {
   macos: '\\.dmg$',
   android: '\\.apk$',
 };
-const PLATFORM_LABELS = { web: 'Web', windows: 'Windows', macos: 'macOS', android: 'Android' };
+const PLATFORM_LABELS = { web: 'Web', windows: 'Windows', macos: 'macOS', android: 'Android', linux: 'Linux', docker: 'Docker' };
 
 const esc = (s) =>
   String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
@@ -39,7 +39,26 @@ function formatSize(bytes) {
   return bytes >= 1048576 ? `${(bytes / 1048576).toFixed(1)} MB` : `${Math.ceil(bytes / 1024)} KB`;
 }
 
+// A project whose releases carry several kinds of download (Arkeep: a server and an
+// agent per OS, plus Docker images) lists them explicitly in `downloads`:
+// { platform, label, asset: <regex for one release asset> } or { platform, label, href }.
+// Both kinds show only once there is a release.
+function listedDownloads(project, release) {
+  if (!release) return [];
+  const links = [];
+  for (const d of project.downloads) {
+    if (d.href) {
+      links.push({ platform: d.platform, label: d.label, href: d.href });
+      continue;
+    }
+    const asset = release.assets.find((a) => new RegExp(d.asset, 'i').test(a.name));
+    if (asset) links.push({ platform: d.platform, label: d.label, href: asset.browser_download_url, meta: formatSize(asset.size) });
+  }
+  return links;
+}
+
 function downloadsFor(project, release) {
+  if (project.downloads) return listedDownloads(project, release);
   const links = [];
   for (const platform of project.platforms ?? []) {
     if (platform === 'web') {

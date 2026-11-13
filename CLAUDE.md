@@ -32,7 +32,9 @@ source of truth for *how* work is done. Update it when the process changes.
   Hosting). Never change visibility or add a licence to a private repo without asking. See
   **Private repos** under Platform notes.
 - **Platforms.** Priority order: **Web**, **Windows**, **macOS**. No Linux/mobile unless a card asks,
-  except native **Android** apps (e.g. World Explorer), which ship a sideloadable `.apk` per release.
+  except native **Android** apps (e.g. World Explorer), which ship a sideloadable `.apk` per release,
+  and self-hosted server apps (Arkeep), which ship Linux archives + Docker images (registry
+  `downloads` list, see **Forks of upstream projects**).
 - **Signing.** Builds are unsigned. The downloads page explains the SmartScreen / Gatekeeper bypass.
 - **Repo owner.** App repos default to `PunterDigital`, but Shay may keep one on his personal account
   (`ShayPunter/…`). The registry `repo` field is authoritative; don't transfer without asking.
@@ -41,7 +43,8 @@ source of truth for *how* work is done. Update it when the process changes.
   Cannot run macOS builds locally — macOS is verified by CI only. Android SDK (with emulator) in
   `%LOCALAPPDATA%\Android\Sdk`; JDK 21 at `C:\Program Files\Java\jdk-21.0.11` (`JAVA_HOME` points at
   Android Studio's JDK 25 JBR, which older Gradle can't run on). No Python: `python3` is the
-  Windows Store stub and hangs the shell until timeout. Use Node for scripts.
+  Windows Store stub and hangs the shell until timeout. Use Node for scripts. No Go either: run Go
+  in a `golang:<version from go.work>` container with the tree piped in (Arkeep `CLAUDE.md`).
 
 ## Board (Personal Apps card table)
 
@@ -356,6 +359,29 @@ For each card in Triage:
   detection asks for elevation from the name alone (`rustc stub.rs -C link-arg=/MANIFEST:EMBED
   "-Clink-arg=/MANIFESTUAC:level='asInvoker' uiAccess='false'"`). Never run a real installer:
   it replaces Shay's install (ProjectTrucks #3354).
+
+**Forks of upstream projects (Arkeep)**
+- Shay may name a GitHub fork of someone else's project (`gh api repos/<repo> --jq .fork,.parent.full_name`).
+  Ask what it's for before onboarding: for Arkeep (Nov 13) it's "our own patched builds + contribute
+  occasionally". The registry gets `upstream: "<owner>/<repo>"`.
+- Don't run the usual onboarding rewrite: keep the upstream licence (Apache-2.0 there, never swap
+  to MIT), no `Initial import`, and leave upstream's files alone. Our CI/release go in **new** files
+  (`pd-ci.yml`, `release-pd.yml`, `.goreleaser.pd.yml`), and our app changes are listed in the
+  project's `PATCHES.md`. Every edit to an upstream file is a conflict on the next sync.
+- Upstream workflows that publish to upstream's registries or open PRs (`release.yml`,
+  `registry-metadata.yml`, `sponsors.yml`, `deps-pins.yml`) get `gh workflow disable`d: a repo
+  setting, no file change. They only register after a push to the fork's `main`, so disable them
+  after the first merge and **before** pushing any tag. Dependabot version updates stay off
+  (bumps arrive with upstream syncs).
+- A new fork runs `pull_request` CI straight away (Actions were enabled on PunterDigital's fork).
+- Upstream's `.gitignore` may list `CLAUDE.md`: `git add -f` it rather than editing their ignore file.
+- Versions: `vX.Y.Z-pd.N` on top of upstream `vX.Y.Z`; push the upstream base tag to the fork
+  too. Upstream syncs merge the upstream **release tag** with a merge commit (never squash), then
+  release `-pd.1`. Weekly maintenance checks `gh release list -R <upstream>` for each registry entry
+  with `upstream` (recipe in Arkeep's `CLAUDE.md`).
+- Public fork = GitHub-hosted runners only, even if Shay asks for the self-hosted one (he agreed
+  once the fork-PR risk was explained, Nov 13). A fork of a public repo can't be made private.
+- Contributions upstream are public under Shay's name: ask before opening one.
 
 **Private repos (free plan)**
 - No branch protection or rulesets (needs GitHub Pro): there are no required checks, so confirm CI
@@ -950,6 +976,9 @@ not picked up by the build step, and it moves to Done once all its pieces are re
   their shown date. Use NoOverflow on both sides.
 - Deploys without a hashed asset: GroundStation's `/version` commit (#4454); for a Forge app whose bump leaves the hash unchanged, `/build/manifest.json`'s
   `Last-Modified` still moves (MDG, Nov 2).
+- Forks (registry `upstream`, e.g. Arkeep): if upstream has a newer release than our last
+  `-pd` base, open a `claude/sync-vX.Y.Z` PR merging that tag (merge commit), then release
+  `vX.Y.Z-pd.1` on the train. A conflict with one of our patches becomes a card.
 - Check the last CI run on each `main` is green; investigate red.
 - `npm audit` (or equivalent) — high/critical findings become `bug` cards.
 - Dependabot runs that fail with `ERR_PNPM_NO_MATURE_MATCHING_VERSION` aren't config bugs: its release-age

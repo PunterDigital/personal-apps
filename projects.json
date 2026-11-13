@@ -1,5 +1,5 @@
 {
-  "$comment": "Registry of managed apps. platforms: web | windows | macos | android. assets: optional per-platform regex overrides for matching release asset filenames. private: true for a private repo (the downloads page skips the release lookup and the source link). status: hidden keeps an app off the downloads page (internal tools with nothing to download).",
+  "$comment": "Registry of managed apps. platforms: web | windows | macos | android | linux | docker. downloads: optional explicit list of {platform, label, asset regex | href} for apps with several downloads per OS (Arkeep). upstream: the repo a fork tracks. assets: optional per-platform regex overrides for matching release asset filenames. private: true for a private repo (the downloads page skips the release lookup and the source link). status: hidden keeps an app off the downloads page (internal tools with nothing to download).",
   "projects": [
     {
       "name": "Nexus SSH",
@@ -152,6 +152,55 @@
       ],
       "webUrl": "https://anitrack.app/",
       "hosting": "forge",
+      "status": "active"
+    },
+    {
+      "name": "Arkeep",
+      "slug": "arkeep",
+      "folder": "arkeep",
+      "repo": "PunterDigital/arkeep",
+      "upstream": "arkeep-io/arkeep",
+      "tag": "arkeep",
+      "description": "Self-hosted backups for all your servers on Restic and Rclone: one server with a web dashboard and a small agent on each machine. PunterDigital's patched build of the open-source Arkeep.",
+      "platforms": [
+        "docker",
+        "linux",
+        "windows",
+        "macos"
+      ],
+      "webUrl": null,
+      "downloads": [
+        {
+          "platform": "docker",
+          "label": "Docker images",
+          "href": "https://github.com/PunterDigital/arkeep/pkgs/container/arkeep-server"
+        },
+        {
+          "platform": "linux",
+          "label": "Server · Linux x64",
+          "asset": "^arkeep-server_linux_amd64\\.tar\\.gz$"
+        },
+        {
+          "platform": "linux",
+          "label": "Server · Linux ARM64",
+          "asset": "^arkeep-server_linux_arm64\\.tar\\.gz$"
+        },
+        {
+          "platform": "linux",
+          "label": "Agent · Linux x64",
+          "asset": "^arkeep-agent_linux_amd64\\.tar\\.gz$"
+        },
+        {
+          "platform": "windows",
+          "label": "Agent · Windows",
+          "asset": "^arkeep-agent_windows_amd64\\.zip$"
+        },
+        {
+          "platform": "macos",
+          "label": "Agent · macOS (Apple Silicon)",
+          "asset": "^arkeep-agent_darwin_arm64\\.tar\\.gz$"
+        }
+      ],
       "status": "active"
     }
   ]
