@@ -391,7 +391,10 @@ For each card in Triage:
   is built for upstream: a branch from the upstream branch they take PRs on (Arkeep: `develop`),
   following their CONTRIBUTING.md, opened as a PR against the upstream repo. **Code only**
   (Shay): the change and its tests, never CLAUDE.md, PATCHES.md or our CI/E2E files; check
-  `git diff --name-only upstream/develop...HEAD` before pushing. The tag is Shay's
+  `git diff --name-only upstream/develop...HEAD` before pushing. **No Claude attribution**
+  upstream either: no `Co-Authored-By: Claude` trailer, no "Generated with Claude Code" in the
+  PR body (overrides the session default; `git log upstream/develop..HEAD --format=%B | grep -i
+  claude` prints nothing). Our own PRs on the fork keep it. The tag is Shay's
   OK to open that public PR under his name. We also carry it in our build (cherry-pick onto our
   `main` via our own PR, a `PATCHES.md` row with the upstream PR link) until an upstream release
   includes it; the sync that brings it in drops the row. A card **without** the tag is a
