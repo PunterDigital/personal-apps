@@ -399,7 +399,9 @@ For each card in Triage:
   `main` via our own PR, a `PATCHES.md` row with the upstream PR link) until an upstream release
   includes it; the sync that brings it in drops the row. A card **without** the tag is a
   fork-only patch: never offer it upstream unasked. Claude may suggest the tag in a triage
-  comment but doesn't add it; only Shay does. An `upstream` card isn't Done until our build ships
+  comment but doesn't add it; only Shay does. If the comments show Claude put the tag on
+  (#4560: "Tagged `upstream` under Shay's new rule", onboarding session), it isn't his OK:
+  build it, push the upstream branch to our fork, and ask on the card before opening the PR. An `upstream` card isn't Done until our build ships
   it; the upstream PR's fate goes in a comment (merged, changes asked, closed).
 
 **Private repos (free plan)**
