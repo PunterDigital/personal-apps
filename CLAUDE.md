@@ -374,6 +374,11 @@ For each card in Triage:
   after the first merge and **before** pushing any tag. Dependabot version updates stay off
   (bumps arrive with upstream syncs).
 - A new fork runs `pull_request` CI straight away (Actions were enabled on PunterDigital's fork).
+  Arkeep's `main` requires upstream's 14 PR job names plus our two: when a sync renames or
+  drops an upstream job, update the protection's checks in the sync PR (repo setting, say so in the run log).
+- Pushing more than 3 tags at once fires no workflows, so the upstream tags went up in one push.
+  The first `-pd` tag still fired upstream's `release.yml` (its tag check refuses `-pd` before
+  any secret is used; it also auto-created an empty `release` environment); it's disabled since.
 - Upstream's `.gitignore` may list `CLAUDE.md`: `git add -f` it rather than editing their ignore file.
 - Versions: `vX.Y.Z-pd.N` on top of upstream `vX.Y.Z`; push the upstream base tag to the fork
   too. Upstream syncs merge the upstream **release tag** with a merge commit (never squash), then
