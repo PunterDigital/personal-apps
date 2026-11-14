@@ -54,10 +54,13 @@ source of truth for *how* work is done. Update it when the process changes.
   (one line per foreground change). A branch cut from `main` before such a fix still steals focus (Nexus #4681,
   Nov 14: five 1 s flashes over Shay's YouTube during a two-spec run): run its E2E with the fix cherry-picked
   (`-n`) on a throwaway local branch.
-  ProjectTrucks still leaks after #2513's `focused(false)`: Nov 14 19:32 a full run put test windows in front three
-  times (~1 s each, last ~40 s of the run, over Helldivers 2), card #4712. Until that's fixed, run the logger for a
-  few seconds *before* any local ProjectTrucks E2E. If a game is in front, skip the local run, rely on CI's
-  E2E, and say so on the PR and card. The logger also prints each window's PID and exe path (a test instance vs
+  ProjectTrucks still leaked after #2513's `focused(false)`: Nov 14 19:32 a full run put test windows in front three
+  times (~1 s each, last ~40 s of the run, over Helldivers 2). Cause: tao re-shows the window with `SW_SHOW` on a
+  later style refresh, and Windows lets that activate once the foreground lock timeout has passed with no
+  keyboard/mouse input (controller play). #4712 (PunterDigital/project-trucks#72) makes the test window
+  non-activatable (`focusable(false)` + a subclass, `src-tauri/src/e2e_window.rs`). A clean logger run so far was
+  only over Chrome in active use. Until one under a game is clean too, run the logger for a few seconds *before* any
+  local ProjectTrucks E2E. If a game is in front, skip the local run, rely on CI's E2E, and say so on the PR and card. The logger also prints each window's PID and exe path (a test instance vs
   an installed app); pair it with `--reporter=list,json` (each result has a `startTime`) to find the spec.
 
 ## Board (Personal Apps card table)
@@ -526,6 +529,14 @@ For each card in Triage:
   request is a fresh PHP process, so the cache is always empty. Cover throttles in Pest.
   The same empty cache hides every Filament 5 toast (they wait in the cache for the page's next
   request): Filament E2E needs `CACHE_STORE=database` on the throwaway SQLite (Panel #2914).
+- A Filament panel that must answer 404 (not 403 or a login redirect) to non-staff: put the check
+  in a subclass of Filament's `Authenticate` used **in its place**. A separate middleware listed
+  before it never runs first, because Laravel's middleware priority sorts every
+  `AuthenticatesRequests` middleware ahead (Hub `AdminAuthenticate`, #4664).
+- A model whose `getRouteKeyName()` isn't the id (username, slug): a resource with
+  `$recordRouteKeyName = 'id'` alone still builds its links with the route key, so every view link
+  404s. Declare the page route as `/{record:id}` too, and test via `Resource::getUrl()`, not a
+  hand-built URL (Hub #4664, E2E caught it).
 - Filament ignores a call to a mounted action that has become `disabled()` since its modal
   opened: the modal stays open and nothing is said. Keep `disabled()` to the button and let the
   action class refuse (Panel `RoleResource::isOpen()`). The same goes for `visible()`: a button
