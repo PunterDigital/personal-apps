@@ -39,7 +39,8 @@ source of truth for *how* work is done. Update it when the process changes.
 - **Repo owner.** App repos default to `PunterDigital`, but Shay may keep one on his personal account
   (`ShayPunter/…`). The registry `repo` field is authoritative; don't transfer without asking.
 - **Machine.** Windows 11, Node 24, git, gh, PHP 8.3 (default) and 8.4 + Composer (via pvm; the
-  `composer` shim always uses 8.3, so for 8.4 run `php <8.4 dir>/composer/composer.phar`), Docker. No .NET SDK.
+  `composer` shim always uses 8.3, so for 8.4 run `php <8.4 dir>/composer/composer.phar`), Docker, and
+  the .NET 10 SDK (found Nov 14; the Hub's `tools/map-tiles` builds ts-map with it, no Docker needed).
   Cannot run macOS builds locally — macOS is verified by CI only. Android SDK (with emulator) in
   `%LOCALAPPDATA%\Android\Sdk`; JDK 21 at `C:\Program Files\Java\jdk-21.0.11` (`JAVA_HOME` points at
   Android Studio's JDK 25 JBR, which older Gradle can't run on). No Python: `python3` is the
