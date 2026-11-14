@@ -54,6 +54,11 @@ source of truth for *how* work is done. Update it when the process changes.
   (one line per foreground change). A branch cut from `main` before such a fix still steals focus (Nexus #4681,
   Nov 14: five 1 s flashes over Shay's YouTube during a two-spec run): run its E2E with the fix cherry-picked
   (`-n`) on a throwaway local branch.
+  ProjectTrucks still leaks after #2513's `focused(false)`: Nov 14 19:32 a full run put test windows in front three
+  times (~1 s each, last ~40 s of the run, over Helldivers 2), card #4712. Until that's fixed, run the logger for a
+  few seconds *before* any local ProjectTrucks E2E. If a game is in front, skip the local run, rely on CI's
+  E2E, and say so on the PR and card. The logger also prints each window's PID and exe path (a test instance vs
+  an installed app); pair it with `--reporter=list,json` (each result has a `startTime`) to find the spec.
 
 ## Board (Personal Apps card table)
 

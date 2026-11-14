@@ -18,8 +18,11 @@ while ((Get-Date) -lt $end) {
   [void][Fg]::GetWindowThreadProcessId($h, [ref]$p)
   $sb = New-Object System.Text.StringBuilder 256
   [void][Fg]::GetWindowText($h, $sb, 256)
-  $name = try { (Get-Process -Id $p -ErrorAction Stop).ProcessName } catch { "?" }
-  $cur = "$name | $($sb.ToString())"
+  $proc = try { Get-Process -Id $p -ErrorAction Stop } catch { $null }
+  $name = if ($proc) { $proc.ProcessName } else { "?" }
+  # PID + exe path tell a test instance (scratch/target folder) from an installed app.
+  $exe = if ($proc) { try { $proc.Path } catch { "" } } else { "" }
+  $cur = "$name | $($sb.ToString()) | pid $p | $exe"
   if ($cur -ne $last) {
     "$(Get-Date -Format HH:mm:ss.fff) $cur" | Out-File -FilePath $Out -Append -Encoding utf8
     $last = $cur
