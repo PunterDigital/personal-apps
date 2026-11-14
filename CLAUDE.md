@@ -203,11 +203,14 @@ For each card in Triage:
   `🤖 Claude: Released in vX.Y.Z — <release URL>. Download: https://punterdigital.github.io/personal-apps/`.
 - Release notes: generated from the merged PRs, grouped Features / Fixes, plain language.
 - **Release PRs skip heavy CI** (Shay, Nov 14: a full Windows run per version bump is wasted
-  usage). ProjectTrucks' `ci.yml` has a `Detect release bump` job (`scripts/is-version-bump.mjs`,
-  merge-base diff): version lines + `CHANGELOG.md` only → the Windows job is skipped by `if:`,
-  which still satisfies its required check; the tag's release workflow builds anyway. Keep the
-  release commit to exactly those edits. Don't cancel a required job to save minutes: a cancelled
-  job fails the check and blocks the merge.
+  usage). ProjectTrucks, Nexus SSH, Finance Dashboard and World Explorer have a `Detect release
+  bump` job in `ci.yml` (`scripts/is-version-bump.mjs`, merge-base diff; each repo's version files
+  are in its `RULES`): version lines + `CHANGELOG.md` only → the heavy job is skipped; the tag's
+  release workflow builds anyway. A plain job skipped by `if:` still satisfies its required check.
+  A **matrix** job must not be skipped at job level (it reports one unexpanded name and the
+  required per-OS checks never arrive), so Nexus/Finance put the condition on every step. Keep the
+  release commit to exactly those edits. New apps with heavy CI get the same job at onboarding.
+  Don't cancel a required job to save minutes: a cancelled job fails the check and blocks the merge.
 
 ## Onboarding a new project folder
 
