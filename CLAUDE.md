@@ -48,8 +48,12 @@ source of truth for *how* work is done. Update it when the process changes.
 - **Shay games on this PC while runs happen.** Local E2E must never take focus from his window (Shay, Nov 14: ProjectTrucks
   test windows pulled him out of ETS2). Headless browsers are fine. Desktop E2E windows open unfocused and off the
   taskbar, with occlusion throttling off so they still render under a fullscreen game (ProjectTrucks
-  `create_main_window`, #2513). Check with a foreground-window logger during a run. Electron apps (Nexus, Finance) don't
-  do this yet (#4616).
+  `create_main_window`, #2513). Nexus and Finance do the same under their test-profile env (`showInactive()`,
+  `skipTaskbar`, no background throttling, #4616). Check with the foreground-window logger during a run:
+  `Start-Process powershell -WindowStyle Hidden -ArgumentList '-ExecutionPolicy','Bypass','-File','scripts\fg-logger.ps1','-Out','<scratchpad>\fg.log','-Seconds','1500'`
+  (one line per foreground change). A branch cut from `main` before such a fix still steals focus (Nexus #4681,
+  Nov 14: five 1 s flashes over Shay's YouTube during a two-spec run): run its E2E with the fix cherry-picked
+  (`-n`) on a throwaway local branch.
 
 ## Board (Personal Apps card table)
 
