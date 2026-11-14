@@ -202,6 +202,12 @@ For each card in Triage:
   version → move the released cards to *Done* with comment
   `🤖 Claude: Released in vX.Y.Z — <release URL>. Download: https://punterdigital.github.io/personal-apps/`.
 - Release notes: generated from the merged PRs, grouped Features / Fixes, plain language.
+- **Release PRs skip heavy CI** (Shay, Nov 14: a full Windows run per version bump is wasted
+  usage). ProjectTrucks' `ci.yml` has a `Detect release bump` job (`scripts/is-version-bump.mjs`,
+  merge-base diff): version lines + `CHANGELOG.md` only → the Windows job is skipped by `if:`,
+  which still satisfies its required check; the tag's release workflow builds anyway. Keep the
+  release commit to exactly those edits. Don't cancel a required job to save minutes: a cancelled
+  job fails the check and blocks the merge.
 
 ## Onboarding a new project folder
 
