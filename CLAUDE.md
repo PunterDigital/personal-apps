@@ -401,7 +401,13 @@ For each card in Triage:
   fork-only patch: never offer it upstream unasked. Claude may suggest the tag in a triage
   comment but doesn't add it; only Shay does. If the comments show Claude put the tag on
   (#4560: "Tagged `upstream` under Shay's new rule", onboarding session), it isn't his OK:
-  build it, push the upstream branch to our fork, and ask on the card before opening the PR. An `upstream` card isn't Done until our build ships
+  build it, push the upstream branch to our fork, and ask on the card before opening the PR.
+  The same goes for cards that arrive with the tag already on and look machine-made: #4567–#4569
+  came through the connector, three in 5 seconds at 23:23 UTC with long specs, so an assistant
+  session (not Shay by hand) may have tagged them. Ask once, on one card, for all of them.
+  Upstream wants an **issue first** for non-trivial changes (their CONTRIBUTING): the issue
+  counts as part of the same OK. Drafts wait in `ops/upstream-drafts/` (gitignored, local
+  only) until then. An `upstream` card isn't Done until our build ships
   it; the upstream PR's fate goes in a comment (merged, changes asked, closed).
 
 **Private repos (free plan)**
