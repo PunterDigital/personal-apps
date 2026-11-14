@@ -75,9 +75,9 @@
       "platforms": [
         "web"
       ],
-      "webUrl": null,
+      "webUrl": "https://project-trucks.shaypunter.co.uk/",
       "hosting": "forge",
-      "status": "hidden"
+      "status": "active"
     },
     {
       "name": "Finance Dashboard",

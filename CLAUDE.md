@@ -181,7 +181,7 @@ For each card in Triage:
 7. Green → `gh pr merge --squash --delete-branch`. Move card to *Awaiting Release*, comment with PR link.
    If checks are still running when the run must end, leave the card in Testing & CI (step 3 next run).
    **Forge apps are the exception** (Panel, AniTrack, MDG, Obsidian Resource Pack Hosting,
-   ProjectTrucks Hub once its Forge site exists, #4633): a merge
+   ProjectTrucks Hub): a merge
    to `main` *is* their release (Forge deploys it). Once the deploy is confirmed live, move the card
    straight to *Done* with `🤖 Claude: Released (live on <webUrl>) — <PR URL>.` They never wait in
    Awaiting Release, and the Monday train doesn't tag them (Shay: Panel Nov 2, all Forge apps
