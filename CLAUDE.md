@@ -45,6 +45,11 @@ source of truth for *how* work is done. Update it when the process changes.
   Android Studio's JDK 25 JBR, which older Gradle can't run on). No Python: `python3` is the
   Windows Store stub and hangs the shell until timeout. Use Node for scripts. No Go either: run Go
   in a `golang:<version from go.work>` container with the tree piped in (Arkeep `CLAUDE.md`).
+- **Shay games on this PC while runs happen.** Local E2E must never take focus from his window (Shay, Nov 14: ProjectTrucks
+  test windows pulled him out of ETS2). Headless browsers are fine. Desktop E2E windows open unfocused and off the
+  taskbar, with occlusion throttling off so they still render under a fullscreen game (ProjectTrucks
+  `create_main_window`, #2513). Check with a foreground-window logger during a run. Electron apps (Nexus, Finance) don't
+  do this yet (#4616).
 
 ## Board (Personal Apps card table)
 
