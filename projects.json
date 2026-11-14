@@ -66,6 +66,20 @@
       "status": "active"
     },
     {
+      "name": "ProjectTrucks Hub",
+      "slug": "project-trucks-hub",
+      "folder": "project-trucks-hub",
+      "repo": "PunterDigital/project-trucks-hub",
+      "tag": "project trucks hub",
+      "description": "The online side of ProjectTrucks: linked apps sync your ETS2 jobs here. Driver profiles, a live feed, virtual trucking companies and leaderboards.",
+      "platforms": [
+        "web"
+      ],
+      "webUrl": null,
+      "hosting": "forge",
+      "status": "hidden"
+    },
+    {
       "name": "Finance Dashboard",
       "slug": "finance-dashboard",
       "folder": "personal-finance",
