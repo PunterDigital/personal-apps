@@ -741,6 +741,10 @@ For each card in Triage:
   AniTrack #88). A Dependabot group that pulls a newer vue-tsc in needs the pin back.
   Larastan 3.13.2+ reads the `#[Signature]` attribute, so an `is_string()` check on a required
   command argument is "always true" and fails PHPStan (Panel #116).
+- SQLite compares a bare bound value in `havingRaw('SUM(x) > ?', [$n])` as text, and any number
+  is "less" than text there, so the condition is never true (PHPUnit and E2E pass while the
+  feature does nothing). Bind it as `CAST(? AS DECIMAL(12,3))`, which MySQL takes too; Larastan
+  refuses an inlined number (`literal-string`) (Hub #4645).
 - A `date:Y-m-d` cast only formats on read: Eloquent still writes `Y-m-d H:i:s`, so on SQLite
   a string `BETWEEN` / `>=` on that column misses the boundary day. Query dates with
   `whereDate()` (Panel #3081).
