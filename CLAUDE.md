@@ -118,6 +118,14 @@ Runs every 2 hours, 09:00–23:00 local, plus 00:00 (scheduled task `personal-ap
    An interactive session with Shay that merges, builds or moves cards takes the lock as well:
    otherwise the next scheduled run starts the same queue in the same checkouts (Oct 26: both
    merged held Panel PRs and opened duplicate fixes, #65/#66).
+   The lock doesn't stop a session that is already open from coming back: Nov 15 the previous run's
+   session went back to #4619 in `project-trucks` (Shay had opened ETS2) after the next run had
+   taken the lock. It switched the shared checkout to its branch and staged edits there, the run cut
+   its #4751 branch from that HEAD a minute later, and `git add -A` swept the other session's files
+   into the run's commit (caught before pushing). So right before `git checkout -b`, check
+   `git branch --show-current` is `main` and `git status` is clean, and stage named paths, not
+   `-A`. A session that comes back mid-run checks `ops/run.lock` and stays out of projects the run
+   is touching.
 1. **Sync.** `git pull` the control repo. For each project in `projects.json`, `git fetch` and make sure
    the local `main` is up to date and the working tree is clean (stash nothing silently — if dirty and
    not from an in-flight Claude branch, flag it on a card / push notification and skip that project).
