@@ -376,6 +376,15 @@ For each card in Triage:
   `--target universal-apple-darwin` with both Rust targets installed.
 - Tauri's build script requires `frontendDist` (`dist/`) to exist, even for `cargo clippy`/`test`:
   build the frontend first.
+- CI installs the latest stable Rust, so a newer clippy can fail a PR that is clean locally (Nov 15:
+  1.100's `chunks_exact_to_as_chunks` on 1.95). Run `rustup update stable --no-self-update` before
+  Rust work.
+- ETS2 telemetry from the real game (ProjectTrucks #4619): reading the plugins' shared memory is
+  read-only and opens no window, so it's fine while Shay plays. One frame: the `live_game` test
+  (`PROJECTTRUCKS_LIVE_TELEMETRY=1`, `=funbit` for the old plugin, `..._DUMP=<file>`). A whole job:
+  a throwaway PowerShell recorder (`MemoryMappedFile.OpenExisting(name, Read)`, one record a second)
+  started with `Start-Process -WindowStyle Hidden`, not under Monitor (Monitor kills it at 30 min);
+  `struct_scs::recorded::recording_to_replay` turns the file into a replay fixture.
 - A copied-in `src-tauri/target` from another path fails with "failed to read plugin permissions …
   app_hide.toml": delete it, the same as copied `node_modules`.
 - `app.security.csp` only applies to bundled assets: `tauri dev` (and a debug binary on the Vite
