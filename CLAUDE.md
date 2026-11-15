@@ -59,9 +59,10 @@ source of truth for *how* work is done. Update it when the process changes.
   times (~1 s each, last ~40 s of the run, over Helldivers 2). Cause: tao re-shows the window with `SW_SHOW` on a
   later style refresh, and Windows lets that activate once the foreground lock timeout has passed with no
   keyboard/mouse input (controller play). #4712 (PunterDigital/project-trucks#72) makes the test window
-  non-activatable (`focusable(false)` + a subclass, `src-tauri/src/e2e_window.rs`). A clean logger run so far was
-  only over Chrome in active use. Until one under a game is clean too, run the logger for a few seconds *before* any
-  local ProjectTrucks E2E. If a game is in front, skip the local run, rely on CI's E2E, and say so on the PR and card. The logger also prints each window's PID and exe path (a test instance vs
+  non-activatable (`focusable(false)` + a subclass, `src-tauri/src/e2e_window.rs`). Clean logger runs so far:
+  over Chrome in active use, and one under a game (Nov 15 23:13, #4654: Shay started Train Simulator seconds after the
+  pre-check showed Chrome; the full 37-spec run went by with no ProjectTrucks window in front). One run isn't proof,
+  so keep running the logger for a few seconds *before* any local ProjectTrucks E2E, and leave it on during the run. If a game is in front, skip the local run, rely on CI's E2E, and say so on the PR and card. The logger also prints each window's PID and exe path (a test instance vs
   an installed app); pair it with `--reporter=list,json` (each result has a `startTime`) to find the spec.
 
 ## Board (Personal Apps card table)
