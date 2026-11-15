@@ -738,7 +738,9 @@ For each card in Triage:
   `package-lock.json` and reinstall. `vp migrate` switches the project to pnpm (reverted). Vite+
   1.x also needs vue-tsc 3.2/3.3: 3.3.12–3.3.14 break `types:check` on any `https://` in a
   template attribute (vuejs/language-tools#6240), so Panel and AniTrack pin 3.3.11 (Panel #2801,
-  AniTrack #88). A Dependabot group that pulls a newer vue-tsc in needs the pin back.
+  AniTrack #88). The Hub runs 3.3.13: there the errors landed on unrelated lines ("Property
+  'value' does not exist" on Wayfinder route helpers, "Cannot find name 'processing'"), so
+  move such strings into the script (Hub #4652). A Dependabot group that pulls a newer vue-tsc in needs the pin back.
   Larastan 3.13.2+ reads the `#[Signature]` attribute, so an `is_string()` check on a required
   command argument is "always true" and fails PHPStan (Panel #116).
 - SQLite compares a bare bound value in `havingRaw('SUM(x) > ?', [$n])` as text, and any number
