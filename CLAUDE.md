@@ -562,6 +562,11 @@ For each card in Triage:
   in a subclass of Filament's `Authenticate` used **in its place**. A separate middleware listed
   before it never runs first, because Laravel's middleware priority sorts every
   `AuthenticatesRequests` middleware ahead (Hub `AdminAuthenticate`, #4664).
+  The same sort puts auth and throttle ahead of a route group's own middleware, so an
+  "outermost" counter or logger on an API group never sees the 401s and 429s. Register it
+  with `$middleware->prependToPriorityList(before: AuthenticatesRequests::class, prepend: …)`
+  and test a 401 and a 429 through it (Hub `RecordApiUsage`, #4667). In a feature test, send
+  unauthenticated requests before any Sanctum-token one: the test client stays signed in after.
 - A model whose `getRouteKeyName()` isn't the id (username, slug): a resource with
   `$recordRouteKeyName = 'id'` alone still builds its links with the route key, so every view link
   404s. Declare the page route as `/{record:id}` too, and test via `Resource::getUrl()`, not a
