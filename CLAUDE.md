@@ -977,6 +977,11 @@ Guard the script (`set -e`, `test -n "$c"`, feed `git mktree` from a file): if `
 fails, `git push origin $c:refs/heads/pr-assets` becomes `:refs/heads/pr-assets` and **deletes**
 the branch (happened on nexus-ssh, restored at once from the fetched commit). Push only after
 `git merge-base --is-ancestor origin/pr-assets $c`.
+The shell guards aren't enough here: on Nov 16 (Hub #4743) a Bash-tool script with `set -e` and
+`test -n` carried on after `git mktree` failed (the literal tab in the mktree lines was lost) and
+deleted `pr-assets` again (restored within a minute from `.git/FETCH_HEAD`). Build the asset
+commit with a Node script written by the Write tool that checks every sha against
+`/^[0-9a-f]{40}$/` and throws before the push (`execFileSync('git', …)`, `\t` in a JS string).
 
 **Backslashes reach Markdown and PHP tests too** (Panel #3084): the same loss hits CLAUDE.md sections and test files written via heredoc/`node -e`. Write them with the Write tool. Also: `cat > file` without a heredoc waits on stdin forever (add `</dev/null`), but never add
 `</dev/null` to a `cat > file <<EOF` line: the later redirect replaces the heredoc and writes an empty
