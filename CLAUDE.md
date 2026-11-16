@@ -88,11 +88,23 @@ To retire an app: open cards → Not Now with a comment, registry `status: "reti
 | Awaiting Release | 30 | Merged to `main`; ships in the next release |
 | Done | 27 | Released; final comment has version + download link |
 
+**Everything waiting on Shay goes in Needs Info** (Shay, Nov 16: "Anything that needs my attention
+should go into the needs info convo"). That covers questions, his own tasks, checks only he can
+do (sign in with a real passkey, try a feature in the game), wording to read through, feature
+flags to switch on, and opt-out choices Claude already defaulted ("say if you'd rather…"). Each one
+is a card in Needs Info tagged `needs answer`. Never leave it only in a comment on a card in
+another column, in the run log's "Waiting on Shay" line, or in a push notification. When the
+item came out of a card that is in Done or Awaiting Release, create a new Needs Info card that
+links the original, and leave the original where it is. One card per thing Shay has to do or
+decide, so he can close each one with a comment.
+
 **Shay's own tasks.** Work only Shay can do (a Forge/Documenso setting, a run that a scheduled
-session isn't allowed to make) goes on a card **assigned to Shay** (member id 1), in Ready, without
-the `claude` tag, with numbered steps in the description or a `🤖 Claude:` comment (Shay asked for
-this on #3446, Nov 9: "make separate tickets and assign them to myself"). The build step skips
-these cards. When Shay comments that it's done, check what you can and move it on.
+session isn't allowed to make) goes on a card **assigned to Shay** (member id 1), in **Needs Info**,
+tagged `needs answer`, without the `claude` tag. Numbered steps go in the description, and a
+`🤖 Claude:` comment says what reply to give ("comment done"). Shay asked for separate cards on
+#3446, Nov 9 ("make separate tickets and assign them to myself"), and for Needs Info rather than
+Ready on Nov 16. When Shay comments that it's done, check what you can, remove `needs answer` and
+move it to Done.
 
 **Tags.** Project tags (lowercase, e.g. `nexus ssh`) map to `projects.json[].tag`. Status tags Claude
 manages: `claude` (Claude owns it), `needs answer` (question pending for Shay), `blocked` (Claude
@@ -160,13 +172,15 @@ Runs every 2 hours, 09:00–23:00 local, plus 00:00 (scheduled task `personal-ap
    Read the full comment thread of any card before you build, merge or release it, and act on any
    un-prefixed comment newer than Claude's last one.
 5. **Triage.** Every card in *Triage* (see **Triage rules**).
-6. **Build.** Take the top `claude` card from *Ready* (cards assigned to Shay are his tasks): `hotfix` / `priority: critical` > `high` > `medium` >
+6. **Build.** Take the top `claude` card from *Ready*: `hotfix` / `priority: critical` > `high` > `medium` >
    `low`; within the same priority, `bug` > due date > oldest. Run the
    **Feature workflow**. Do up to 2 cards per run if time allows; never leave a card half-done without
    a comment saying where it stands.
 7. **Release.** Apply the **Release cadence**.
-8. **Report.** Append a short entry to `ops/run-log.md`. If anything needs Shay (new questions,
-   `blocked`, permission needed), send ONE push notification summarising it. Remove the lock.
+8. **Report.** Append a short entry to `ops/run-log.md`. Anything new that needs Shay (questions,
+   `blocked`, permission needed, a task or check only he can do) must already be a card in
+   Needs Info (see **Board**); the log's "Waiting on Shay" line just lists those card ids. Then
+   send ONE push notification summarising the new ones. Remove the lock.
 
 ## Triage rules
 
@@ -1160,7 +1174,8 @@ not picked up by the build step, and it moves to Done once all its pieces are re
 ## Permissions
 
 Scheduled runs cannot ask for approval. If a run is blocked by a permission prompt/denial, record it in
-`ops/permission-requests.md` (tool, exact command, why it was needed, how often) and push-notify Shay.
+`ops/permission-requests.md` (tool, exact command, why it was needed, how often), open a Needs Info
+card for it (assigned to Shay, `needs answer`, pointing at the entry), and push-notify Shay.
 Shay approves from an interactive session in this folder, which then updates `.claude/settings.json`.
 
 ## Rules of engagement
