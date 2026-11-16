@@ -1121,6 +1121,22 @@ not picked up by the build step, and it moves to Done once all its pieces are re
 - A crashed run leaves `ops/run.lock` and possibly uncommitted work on a `claude/*` branch. When
   the lock is stale and no session is running, take the lock, `git add -A && git commit` the WIP on
   that branch before any other git command, then finish the card from there (Panel #3600, Nov 2).
+- Nov 16 train (ten agents, ~75 min): drive E: ran out of space mid-run (18 GB free at the start;
+  a Hub PHPUnit run and a ProjectTrucks `cargo test` failed "No space left on device").
+  Check `df -h /e` before a parallel train. ProjectTrucks' `src-tauri/target/debug/incremental`
+  (23 GB) is safe to delete, and `CARGO_INCREMENTAL=0` keeps it from growing back.
+- A green Dependabot group PR based on current `main` can be reproduced exactly with
+  `git checkout origin/<dependabot-branch> -- package.json <lockfile>` on the `claude/deps` branch;
+  Dependabot then closes its PR by itself after the merge.
+- Merging the release bump right after the deps PR cancels main's full CI run on the deps commit
+  (the bump run skips the heavy job). The deps PR's own run is the full check of that tree.
+- World Explorer, Nexus SSH, Finance Dashboard and Clerq have no `CHANGELOG.md`: their bump PR is
+  version lines only, and the generated notes need a `gh release edit --notes-file` afterwards.
+- After `npm update` here, `node_modules` can keep extraneous `@emnapi/*` / `oxide-wasm32-wasi`
+  packages: Tailwind then builds a ~4 KB CSS with no utilities ("ExperimentalWarning: WASI").
+  A plain `npm install` from the same lockfile fixes it. Check the CSS size after a Tailwind bump (MCPacks).
+- The gh token has no `read:packages`: check GHCR images with an anonymous token from
+  `https://ghcr.io/token?scope=repository:punterdigital/<image>:pull` and a manifest GET (Arkeep).
 
 ## Permissions
 
