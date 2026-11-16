@@ -118,7 +118,7 @@ function renderProject(project, release) {
 
 const registryPath = process.argv[2] ?? join(root, 'projects.json');
 const registry = JSON.parse(await readFile(registryPath, 'utf8'));
-const projects = registry.projects.filter((p) => p.status !== 'hidden');
+const projects = registry.projects.filter((p) => p.status !== 'hidden' && p.status !== 'retired');
 const sections = [];
 for (const project of projects) {
   // A private repo's releases aren't visible to the Pages workflow's token, and

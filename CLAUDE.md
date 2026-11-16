@@ -21,6 +21,16 @@ source of truth for *how* work is done. Update it when the process changes.
 - Downloads page: https://punterdigital.github.io/personal-apps/
 - GroundStation project: **Personal Apps** (project_id `8`)
 
+**Retired apps.** A registry entry with `status: "retired"` is decommissioned: skip it in every step
+(sync, triage, build, release train, weekly maintenance), and the downloads page leaves it out. Its
+repo is archived and its local folder removed; if the folder ever reappears, don't onboard it, ask.
+A card that arrives with a retired app's tag goes to Not Now with a comment. Retired so far: Finance
+Dashboard (Nov 16; Shay uses an AI agent for his finances now). Its platform notes below still
+describe working code in the archived repo, so they stay.
+To retire an app: open cards → Not Now with a comment, registry `status: "retired"` + `retiredOn`,
+`gh repo archive`, check the checkout for stashes, unpushed branches and **ignored data files**
+(Finance had Shay's real `finance.db` and spreadsheet in it) before deleting it, rebuild the page.
+
 ## Fixed facts
 
 - **Identity.** The GroundStation connection acts as Shay. Every comment Claude writes MUST start with

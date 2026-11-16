@@ -1,5 +1,5 @@
 {
-  "$comment": "Registry of managed apps. platforms: web | windows | macos | android | linux | docker. downloads: optional explicit list of {platform, label, asset regex | href} for apps with several downloads per OS (Arkeep). upstream: the repo a fork tracks. assets: optional per-platform regex overrides for matching release asset filenames. private: true for a private repo (the downloads page skips the release lookup and the source link). status: hidden keeps an app off the downloads page (internal tools with nothing to download).",
+  "$comment": "Registry of managed apps. platforms: web | windows | macos | android | linux | docker. downloads: optional explicit list of {platform, label, asset regex | href} for apps with several downloads per OS (Arkeep). upstream: the repo a fork tracks. assets: optional per-platform regex overrides for matching release asset filenames. private: true for a private repo (the downloads page skips the release lookup and the source link). status: hidden keeps an app off the downloads page (internal tools with nothing to download). status: retired = decommissioned: off the downloads page, skipped by every run, repo archived, local folder removed.",
   "projects": [
     {
       "name": "Nexus SSH",
@@ -95,7 +95,8 @@
         "windows": "Setup-.*\\.exe$",
         "macos": "universal\\.dmg$"
       },
-      "status": "active"
+      "status": "retired",
+      "retiredOn": "2026-11-16"
     },
     {
       "name": "Obsidian Resource Pack Hosting",
