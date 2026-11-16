@@ -1071,6 +1071,10 @@ not picked up by the build step, and it moves to Done once all its pieces are re
   the clock. And overflowing `addMonths` isn't monotonic (Aug 31 + 6 = Mar 3, Sep 1 + 6 = Mar 1):
   a shown date from `addMonths` with a cleanup cutoff from `subMonths` deleted packs before
   their shown date. Use NoOverflow on both sides.
+- A test that mixes a fixed date with the real clock breaks when the calendar passes it: the Hub's
+  sync test used a job dated Sat Nov 14 with no `travelTo`, and from Monday Nov 16 that week was
+  "finished", so the driver also got the weekly "Top ten" and `main` went red with no code change
+  (fixed in Hub #32). A red test on a Monday with an untouched diff: look for a hard-coded date first.
 - Deploys without a hashed asset: GroundStation's `/version` commit (#4454); for a Forge app whose bump leaves the hash unchanged, `/build/manifest.json`'s
   `Last-Modified` still moves (MDG, Nov 2).
 - Forks (registry `upstream`, e.g. Arkeep): if upstream has a newer release than our last
