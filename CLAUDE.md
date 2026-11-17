@@ -1007,6 +1007,12 @@ edits the first match only. A field meant for Edit engagement landed in End enga
 Inside `rep`, use `s.replace(a, () => b)`, not `s.replace(a, b)`: in a replacement string
 `` $` `` / `$&` / `$'` are special, so a template literal ending in `` ${id}$` `` (a regex
 anchor) pasted the whole file into the spec (Panel #3983).
+"Before it writes anything" only holds if `rep` edits a string in memory and the script writes
+each file once, after every `rep` has passed. A `rep` that reads and writes the file itself leaves
+the earlier edits applied when a later pattern fails, and rerunning the script then fails on
+those (ProjectTrucks #4756: five of six edits landed, then a stale anchor stopped it).
+Don't put a shell-quoted `node -e '…'` around text with an apostrophe ("game's"): the shell
+ends the string there. Use the Edit tool for those.
 
 **Parallel branches in one repo.** While subagents edit the main checkout, a second card can go in a
 `git worktree add` under the scratchpad (never a top-level folder here: the next run would onboard it),
