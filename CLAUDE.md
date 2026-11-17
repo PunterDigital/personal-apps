@@ -501,6 +501,10 @@ For each card in Triage:
 - **GroundStation** (`groundstation/`) is the app this board and the GroundStation MCP connector
   run on. A merge to its `main` redeploys the pipeline's own board, so after every merge check
   the live site *and* that an MCP call still answers before carrying on with the run.
+  Since #4950 a password change or reset on Shay's GroundStation login revokes every MCP
+  token of that login, the connector's OAuth grant included: if the connector starts
+  answering 401 while `/version` is fine, that's the likely cause. Shay has to reconnect it;
+  open a Needs Info card if a run finds it that way.
   Check the deploy with `curl https://app.groundstationhq.com/version`: its `commit` is the
   Publish run's `github.sha` (a build arg, #4454), so it moves on every merge, workflow-only
   ones included (`app.js`'s `Last-Modified` doesn't, #3838). Plus a working MCP call.
