@@ -1074,6 +1074,11 @@ GitHub Actions on the self-hosted runner: a job `container:` breaks every JS act
 ~10 minutes before deciding the rebuild failed. Two deploys a few minutes apart can fail with "in
 progress deployment. Please cancel … first". That's harmless if the earlier deploy has the new release.
 
+**Reading the board.** Since #4885 (Nov 17) `get_card_table` leaves the Done column's cards out
+(`card_count` stays, `cards_left_out: true`) and answers in one go, so it no longer overflows
+to a file. Pass `include_done: true` only when you need Done card ids.
+GroundStation's MCP timings: `node scripts/mcp-bench.js` in `groundstation/` (its `CLAUDE.md`).
+
 **Card ids.** Cards and comments share one id sequence, so you can't predict a new card's number.
 Create the card first, then mention its id in other comments.
 Comments are sanitized HTML: an angle-bracket placeholder like `<email>` disappears, even inside backticks. Write a concrete example (`you@example.com`) or `&lt;email&gt;`.
