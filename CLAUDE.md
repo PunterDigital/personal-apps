@@ -414,6 +414,9 @@ For each card in Triage:
   `struct_scs::recorded::recording_to_replay` turns the file into a replay fixture.
 - A copied-in `src-tauri/target` from another path fails with "failed to read plugin permissions …
   app_hide.toml": delete it, the same as copied `node_modules`.
+- CI's three Rust compiles (clippy, `cargo test`, `tauri build`) can't usefully share: `cargo test --release
+  --features tauri/custom-protocol` after `tauri build` reuses the release lib, but its optimized test harness costs
+  what the debug test build did (ProjectTrucks #4794: 105 s vs 103 s of compile, PR closed).
 - `app.security.csp` only applies to bundled assets: `tauri dev` (and a debug binary on the Vite
   devUrl) runs with no CSP at all. Check CSP changes on a release binary, with an E2E fixture that
   fails on console errors after a reload (ProjectTrucks `e2e/fixtures.ts`).
