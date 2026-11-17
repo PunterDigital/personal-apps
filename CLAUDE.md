@@ -923,6 +923,10 @@ Inertia apps (Laravel starter kits) are the exception: after an XHR submit (2FA 
 login into a Filament panel) the undrawn pane never follows the redirect. Drive those flows
 with a throwaway Playwright spec instead (headless Chromium, screenshots to the scratchpad),
 never committed (Panel #2787).
+Nov 17 (GroundStation #4951): `preview_start({url})` and `navigate` to `http://localhost:<port>`
+answered "denied or failed" (a site approval nobody was there to give). Don't wait on it: drive
+the throwaway server with a headless Playwright script from the scratchpad
+(`require('<project>/node_modules/@playwright/test').chromium`), screenshots to the scratchpad.
 `preview_start` by `name` only reads the session folder's `.claude/launch.json` (this control
 repo, which has none), not the project's. Start the project's server with Bash
 (`run_in_background`, throwaway DB, spare port), open it with `preview_start({url})`, and stop
@@ -977,6 +981,9 @@ Private repos (Panel, GroundStation, Obsidian): raw.githubusercontent images don
 embed `https://github.com/<repo>/blob/pr-assets/<card>/<file>.png?raw=true` (Panel #3602).
 `main` stays image-free. Capture with a temporary Playwright spec that is never committed, and point
 any file browser at a temp dir, never Shay's home folder.
+Never re-upload a screenshot Shay attached to a card to a **public** repo's `pr-assets`: his show
+real host names, usernames and LAN IPs (Nexus #5004). Link the card, or capture the bug against
+the test server instead.
 Give Node/Playwright a Windows path (`C:/Users/...`), not Git Bash's `/c/Users/...`: Node reads
 that as a path on the current drive and wrote the screenshot to `E:\c\Users\...` (Panel #3535).
 Guard the script (`set -e`, `test -n "$c"`, feed `git mktree` from a file): if `git commit-tree`
