@@ -54,7 +54,9 @@ To retire an app: open cards → Not Now with a comment, registry `status: "reti
   Cannot run macOS builds locally — macOS is verified by CI only. Android SDK (with emulator) in
   `%LOCALAPPDATA%\Android\Sdk`; JDK 21 at `C:\Program Files\Java\jdk-21.0.11` (`JAVA_HOME` points at
   Android Studio's JDK 25 JBR, which older Gradle can't run on). No Python: `python3` is the
-  Windows Store stub and hangs the shell until timeout. Use Node for scripts. No Go either: run Go
+  Windows Store stub and hangs the shell until timeout. Use Node for scripts. This PC's DNS
+  doesn't resolve `www.googletagmanager.com` (Nov 17), so specs that load the real Google tag
+  (AniTrack `google-tag.spec.ts`) fail locally: rely on CI for them. No Go either: run Go
   in a `golang:<version from go.work>` container with the tree piped in (Arkeep `CLAUDE.md`).
 - **Shay games on this PC while runs happen.** Local E2E must never take focus from his window (Shay, Nov 14: ProjectTrucks
   test windows pulled him out of ETS2). Headless browsers are fine. Desktop E2E windows open unfocused and off the
