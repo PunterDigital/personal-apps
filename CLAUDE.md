@@ -495,6 +495,11 @@ For each card in Triage:
   just the web link. Releases are still tagged and published in the repo.
 - `gh api .../actions/runners` needs `admin:org`, which the gh token lacks: the runner's health
   is only visible through whether jobs get picked up.
+- An offline runner looks like this: the run sits `queued`, every job has `runnerName` null, and
+  no run is `in_progress` or queued in any other private repo (Nov 18: GroundStation #128 waited
+  30+ min, last good job 20:47 UTC). Nothing here can restart it: leave the card in Testing & CI
+  with a "merge on hold" comment and open a Needs Info card for Shay (#5047). Don't merge
+  GroundStation without CI.
 - A hung job blocks every private repo's CI. Panel's E2E step once sat 66 minutes with no output
   and no job `timeout-minutes` (the default is 6 h); cancel and rerun (it passed in 8 min), and keep
   an eye on runs over 20 minutes (Oct 26).
