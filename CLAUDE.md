@@ -1157,6 +1157,12 @@ not picked up by the build step, and it moves to Done once all its pieces are re
 - Check a major's licence before merging, even with green CI: `npm view <pkg>@<v> license`
   (and the tarball's LICENSE). PrimeVue 5 went from MIT to a commercial PrimeUI licence that
   needs a key (`@primeui/license-manager` dependency); a licence change is Shay's call (AniTrack #4252).
+- Guzzle 7 → 8: a read timeout is no longer a `ConnectException` (now `NetworkTimeoutException`;
+  a timeout after the headers is `ResponseTimeoutException`). Code that retries on
+  `ConnectException` stops retrying timeouts while CI stays green. Catch
+  `NetworkException|ResponseTransferException` and test each class with a `MockHandler`
+  (AniTrack `AniListClient`, #4810). Laravel's `Http::` client catches `TransferException`, so
+  `ConnectionException` handlers need no change.
 - TypeScript 7 (the native compiler) has no JS compiler API, so `vue-tsc` can't run on it
   ("typescript/lib/tsc" not exported). Projects with vue-tsc stay on TS 6.0 (the last JS release)
   with a Dependabot `ignore: typescript >=7` (AniTrack extension, #3820).
