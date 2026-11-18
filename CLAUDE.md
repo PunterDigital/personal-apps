@@ -737,6 +737,12 @@ For each card in Triage:
   a spec that takes 14 s in CI took 60 s here. A local-only timeout on whatever step came last
   is the spec's `timeout` budget, not that step: compare the trace's test start with the
   failure time before debugging the step (#4092).
+  With a game running (Nov 18, Helldivers 2 at the top of the CPU list) it is unusable: even
+  the single-worker suite failed login specs on 5 s `toHaveURL` timeouts. Check the top CPU
+  processes before reading a red local Panel run, and let CI decide (#4845).
+  Once #4845 (panel PR #193) is merged, Panel E2E runs 2 workers, one `artisan serve` +
+  SQLite file each (`E2E_WORKERS`, ports `E2E_PORT`+n): a second checkout's `E2E_PORT`
+  must then be at least 2 away.
 - A Filament page left in a background tab (a spec opened a second `browser.newPage()` for the
   client) never pulls its toast: `bringToFront()` before the next action whose toast you assert
   (Panel `organisation-approval.spec.ts`, #3536).
@@ -1178,6 +1184,9 @@ not picked up by the build step, and it moves to Done once all its pieces are re
   (recipe in its `CLAUDE.md`, "Dependency updates") (ProjectTrucks #2879).
 - The release train is a good fit for parallel sub-agents (one per project, release + maintenance,
   no board writes); the parent moves cards and rebuilds the downloads page once at the end.
+  A macOS job can also end red after 15 min with "The job was not acquired by Runner of type
+  hosted even after multiple attempts" (no steps ran): GitHub capacity, not the code.
+  `gh run rerun <id> --failed` (Nexus #71, Nov 18: passed on the rerun).
   Nov 2: seven agents (the two Forge Laravel apps paired, the two private repos paired) plus Panel
   in the parent finished ten projects in ~80 minutes. Expect macOS hosted runners to queue 10–15
   min when several apps release at once, and local E2E to time out on logins while the agents
