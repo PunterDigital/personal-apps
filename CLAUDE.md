@@ -447,7 +447,9 @@ For each card in Triage:
 - Upstream workflows that publish to upstream's registries or open PRs (`release.yml`,
   `registry-metadata.yml`, `sponsors.yml`, `deps-pins.yml`) get `gh workflow disable`d: a repo
   setting, no file change. They only register after a push to the fork's `main`, so disable them
-  after the first merge and **before** pushing any tag. Dependabot version updates stay off
+  after the first merge and **before** pushing any tag. Check with `gh workflow list --all`:
+  `deps-pins.yml` was listed as disabled in Arkeep's `CLAUDE.md` but was still active, and its
+  Monday schedule ran and failed on Nov 16 (disabled Nov 19). Dependabot version updates stay off
   (bumps arrive with upstream syncs).
 - A new fork runs `pull_request` CI straight away (Actions were enabled on PunterDigital's fork).
   Arkeep's `main` requires upstream's 14 PR job names plus our two: when a sync renames or
