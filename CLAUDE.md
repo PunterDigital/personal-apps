@@ -874,6 +874,9 @@ For each card in Triage:
   route for it never runs: keep it a static file. A local `bootstrap/ssr` left by a build makes
   `ssr.enabled => true` call the SSR server in PHPUnit (stray request / extra
   `Http::assertSentCount`): default `INERTIA_SSR_ENABLED` to false (Hub #5149/#5157).
+  Don't rely on Shay editing the Forge deploy script's build command: make plain `npm run build`
+  build the SSR bundle too (`vp build && vp build --ssr`). Hub #5165: the daemon reported
+  "Inertia SSR bundle not found" until #47 did that, and it came up by itself on the next deploy.
 - Blade compiles directives before echoes, even inside `{!! !!}`: a JSON-LD key `'@context'` there
   became Laravel's `@context` directive, so the live page source showed `<?php $__contextArgs…`
   (AniTrack #4456). Write `'@@context'`, and grep root views for `'@` keys in other apps.
@@ -1151,6 +1154,13 @@ not picked up by the build step, and it moves to Done once all its pieces are re
 - Forks (registry `upstream`, e.g. Arkeep): if upstream has a newer release than our last
   `-pd` base, open a `claude/sync-vX.Y.Z` PR merging that tag (merge commit), then release
   `vX.Y.Z-pd.1` on the train. A conflict with one of our patches becomes a card.
+- **Hub blog post** (Shay, #5153): draft one post a week about something real (a release or
+  feature of ProjectTrucks or the Hub, a guide topic, or a monthly leaderboard/VTC roundup from
+  public data only, never private profiles). Write `resources/posts/<Y-m-d>-<slug>.php` in
+  `project-trucks-hub` (format in that folder's README), check every fact against the code or
+  release notes, open a PR, merge on green. The deploy turns it into a **draft**; open a Needs
+  Info card assigned to Shay ("read and publish /blog/<slug> in Admin → Blog posts"). Shay
+  publishes; runs never do, unless he says otherwise on a card.
 - Check the last CI run on each `main` is green; investigate red.
 - `npm audit` (or equivalent) — high/critical findings become `bug` cards.
 - Dependabot runs that fail with `ERR_PNPM_NO_MATURE_MATCHING_VERSION` aren't config bugs: its release-age
