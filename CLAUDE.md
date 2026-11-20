@@ -867,6 +867,13 @@ For each card in Triage:
   The Forge daemon command sets it: `/usr/bin/env INERTIA_SSR_PORT=13721 php8.4 artisan
   inertia:start-ssr`. The daemon log (`~/.forge/daemon-<id>.log`) prints the port. With
   zero-downtime deploys `stop-ssr` must come after `$ACTIVATE_RELEASE()` (AniTrack #4272, Nov 10).
+- Inertia 3's Vite plugin (no `ssr.ts`, the bundle is `bootstrap/ssr/app.js`) bakes the SSR
+  server's port **and host** in at build time, and the host defaults to `0.0.0.0`: set
+  `inertia({ ssr: { host: '127.0.0.1', port } })` and match `config/inertia.php`'s URL. Forge's
+  nginx answers `/robots.txt` from `public/` itself (`location = /robots.txt`), so a Laravel
+  route for it never runs: keep it a static file. A local `bootstrap/ssr` left by a build makes
+  `ssr.enabled => true` call the SSR server in PHPUnit (stray request / extra
+  `Http::assertSentCount`): default `INERTIA_SSR_ENABLED` to false (Hub #5149/#5157).
 - Blade compiles directives before echoes, even inside `{!! !!}`: a JSON-LD key `'@context'` there
   became Laravel's `@context` directive, so the live page source showed `<?php $__contextArgs…`
   (AniTrack #4456). Write `'@@context'`, and grep root views for `'@` keys in other apps.
