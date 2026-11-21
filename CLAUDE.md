@@ -1029,6 +1029,11 @@ The shell guards aren't enough here: on Nov 16 (Hub #4743) a Bash-tool script wi
 deleted `pr-assets` again (restored within a minute from `.git/FETCH_HEAD`). Build the asset
 commit with a Node script written by the Write tool that checks every sha against
 `/^[0-9a-f]{40}$/` and throws before the push (`execFileSync('git', …)`, `\t` in a JS string).
+That script is now `scripts/pr-assets.mjs` here: `node scripts/pr-assets.mjs <repo dir> <card>
+<png>…` (keeps the other card folders, checks the push is a fast-forward, and starts the orphan
+branch in a repo that has none yet: MCPacks had none, Nov 21).
+Right after `gh pr create`, `gh run list --branch <b>` can still be empty for a few seconds: wait
+for the run to appear before `gh run watch <id>` (an empty id fails at once, #5208).
 
 **Backslashes reach Markdown and PHP tests too** (Panel #3084): the same loss hits CLAUDE.md sections and test files written via heredoc/`node -e`. Write them with the Write tool. Also: `cat > file` without a heredoc waits on stdin forever (add `</dev/null`), but never add
 `</dev/null` to a `cat > file <<EOF` line: the later redirect replaces the heredoc and writes an empty
