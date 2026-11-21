@@ -877,6 +877,14 @@ For each card in Triage:
   Don't rely on Shay editing the Forge deploy script's build command: make plain `npm run build`
   build the SSR bundle too (`vp build && vp build --ssr`). Hub #5165: the daemon reported
   "Inertia SSR bundle not found" until #47 did that, and it came up by itself on the next deploy.
+- Search Console's HTML-file check (`public/google<id>.html`, Hub #5161): Forge's nginx serves it
+  straight from `public/`. Vite+'s `vp check` formats `public/*.html` and would change the bytes
+  Google compares, so add the file to `fmt.ignorePatterns` in `vite.config.ts`. In a Vite+ project,
+  format with `npm run check:fix`: a bare `npx prettier --write` ignores the `fmt` settings
+  (it switched a spec to double quotes).
+- Hard-deleted records leave history only in an audit log: MCPacks' analytics (#5194) count
+  deleted packs from the `delete` rows' metadata (created_at, size, reason). Check what the delete
+  path logs before promising a backfill, and never prune those rows.
 - Blade compiles directives before echoes, even inside `{!! !!}`: a JSON-LD key `'@context'` there
   became Laravel's `@context` directive, so the live page source showed `<?php $__contextArgs…`
   (AniTrack #4456). Write `'@@context'`, and grep root views for `'@` keys in other apps.
