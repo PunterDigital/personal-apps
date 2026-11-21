@@ -782,7 +782,12 @@ For each card in Triage:
   without the fragment and keep `preserveScroll` on the form (Hub #5221).
 - Seeded E2E users created "now" go to the top of a newest-first admin list and can push a
   user an older spec looks for off page 1 (Hub `moderation.spec`, #5221): backdate new seed
-  accounts (`created_at => now()->subYear()`).
+  accounts (`created_at => now()->subYear()`). Companies too: one more seeded company pushed
+  Nordic Haulage off the Hub's admin Companies page 1 (`admin.spec`, #5223); the spec now
+  searches (`?search=nordic`), as it does for users.
+- `Queue::fake()` with no list also swallows queued notifications (a `ShouldQueue`
+  notification is a job, even with `viaConnections` on `sync`), so a test asserting a bell
+  row finds none. Fake only the job you assert: `Queue::fake([PostToDiscord::class])` (Hub #5223).
 - Add new E2E seed data at the **end** of an `E2ESeeder`: a new organisation seeded mid-file shifts the
   ids of every later record, and an older spec that depends on them broke (Panel `organisation-approval`
   failed with a Livewire entangle error until the seed moved, #3605).
