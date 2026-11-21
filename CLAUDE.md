@@ -765,6 +765,13 @@ For each card in Triage:
   with the saved credential. A rate limiter `->by($request->input('email'))` puts every
   email-less request (passkeys) in one site-wide bucket. Playwright's `page.url()` right after
   clicking an Inertia link can still be the old URL: wait for something on the new page first.
+- Inertia: a redirect with `->withFragment('x')` after a form submit comes back as a **409**
+  with `X-Inertia-Redirect` (the client then follows it with the hash). The browser logs the
+  409 as a console error, so every E2E fixture that fails on console errors fails. Redirect
+  without the fragment and keep `preserveScroll` on the form (Hub #5221).
+- Seeded E2E users created "now" go to the top of a newest-first admin list and can push a
+  user an older spec looks for off page 1 (Hub `moderation.spec`, #5221): backdate new seed
+  accounts (`created_at => now()->subYear()`).
 - Add new E2E seed data at the **end** of an `E2ESeeder`: a new organisation seeded mid-file shifts the
   ids of every later record, and an older spec that depends on them broke (Panel `organisation-approval`
   failed with a Livewire entangle error until the seed moved, #3605).
