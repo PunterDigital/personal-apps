@@ -169,7 +169,10 @@ Runs every 2 hours, 09:00–23:00 local, plus 00:00 (scheduled task `personal-ap
    (usually → Ready with acceptance criteria). If unanswered for 7 days, push-notify once.
    Shay often answers while a run is going: the Oct 30 11:10 run read Needs Info at its start
    and missed three answers posted 15 minutes later. Before the report (step 8), check
-   `list_activity` for comments newer than the run's start and act on them.
+   `list_activity` for comments newer than the run's start and act on them. Pass `limit: 100`
+   and check the oldest entry is older than the run's start: the default 25 can end before it.
+   The Nov 21 17:59 run saw Shay's 17:12 answers but missed his "go" on #4560 at 17:03 (Shay's
+   own card moves and the run's comments filled the list); the next run picked it up.
    Shay also comments on cards in other columns (objections on Ready cards, notes on In Progress).
    Read the full comment thread of any card before you build, merge or release it, and act on any
    un-prefixed comment newer than Claude's last one.
@@ -454,6 +457,14 @@ For each card in Triage:
 - A new fork runs `pull_request` CI straight away (Actions were enabled on PunterDigital's fork).
   Arkeep's `main` requires upstream's 14 PR job names plus our two: when a sync renames or
   drops an upstream job, update the protection's checks in the sync PR (repo setting, say so in the run log).
+- **`gh` in a fork checkout defaults to the parent repo**: a plain `gh pr create` (no `-R`) in
+  `arkeep/` opened our docs-only PATCHES.md PR against arkeep-io/arkeep as #496 (Nov 21,
+  closed within a minute). Always pass `-R PunterDigital/<fork>` or `-R <upstream>`; `gh repo
+  set-default PunterDigital/arkeep` is now set in that checkout, but a new clone or worktree
+  lacks it.
+- An upstream branch that sat waiting for Shay's "go" goes stale: cherry-pick it onto current
+  `upstream/develop` as a new branch (don't force-push the old one), rerun the suites, push the new branch and
+  open the PR from it (#4560: 94 commits behind after 8 days).
 - Pushing more than 3 tags at once fires no workflows, so the upstream tags went up in one push.
   The first `-pd` tag still fired upstream's `release.yml` (its tag check refuses `-pd` before
   any secret is used; it also auto-created an empty `release` environment); it's disabled since.
