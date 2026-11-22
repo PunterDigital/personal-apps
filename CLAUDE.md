@@ -1141,6 +1141,10 @@ let CI's Postgres/MySQL job run the E2E, and say on the PR and card that local E
 (Clerq #74, #77, #78). Check in CI's E2E log that the new spec actually ran. For a Redis-backed test, start
 `redis:7-alpine` on a private network with no published port and run the suite in a node
 container on that network (GroundStation #2564: `REDIS_URL=redis://gs-redis:6379`).
+When you pipe files into a container, Git Bash's GNU `tar` reads `C:/…` in `-C`/`-f` as a
+remote host ("Cannot connect to C: resolve failed"). Convert the scratchpad path with
+`cygpath -u` first (MVM #5324). A real-SSH check needs no published port: an `alpine` sshd with the key in
+`authorized_keys` and the app in `php:8.4-cli` on one private network (recipe on MVM #15).
 
 **Docker ports.** Published container ports (e.g. GroundStation's compose MySQL on 3307) are not
 reachable from the host here (ECONNREFUSED although healthy). Run DB tests inside a container on
