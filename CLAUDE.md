@@ -1156,6 +1156,11 @@ can't read the inner script) and an unattended run has nobody to approve it: wri
 to a script file, `docker cp` it in, and use a fresh folder per attempt instead of `rm`
 (MVM #5288). Shell scripts meant for a VPS can be checked in an `ubuntu:24.04` container with
 `systemctl`/`cloud-init` stubbed (recipe in MVM's `CLAUDE.md`, "World sync").
+Git Bash also rewrites `docker exec -w /app` into a Windows path ("OCI runtime exec failed:
+Cwd must be an absolute path"): set `MSYS_NO_PATHCONV=1` for docker commands with container
+paths. A long-lived `php:8.4-cli` container (`docker run -d --rm … sleep 3600`, ext-zip added
+once with `docker-php-ext-install`, tree piped in with `docker exec -i`) saves reinstalling per
+run; S3 checks use `adobe/s3mock` on the network (MVM #5347, recipe in its `CLAUDE.md`).
 After `git mv`, don't name the old path in `git add <paths>`: the pathspec error stages
 nothing, and a `git push` on the next line still runs (it pushed the bare branch, #5288).
 
