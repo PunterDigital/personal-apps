@@ -228,8 +228,9 @@
       "platforms": [
         "web"
       ],
+      "webUrl": "https://minecraft.shaypunter.co.uk/",
       "hosting": "forge",
-      "status": "hidden"
+      "status": "active"
     }
   ]
 }

@@ -825,8 +825,11 @@ For each card in Triage:
   into the Forge build. Don't rename via `APP_NAME` on a live app: it also names the session
   cookie and cache prefix, so everyone gets signed out (Panel #3602).
 - Vite+ (`vite-plus`, the starter kits' toolchain) ≥ 0.3.3 needs `vite` aliased to
-  `npm:@voidzero-dev/vite-plus-core@<same version>` (plus an `overrides.vite` for the plugins'
-  peers). Upgrading it with npm: the old lock keeps `vite@8` on top and npm fails with a
+  `npm:@voidzero-dev/vite-plus-core@<version>` (plus an `overrides.vite` for the plugins'
+  peers). Up to 1.6 the core had vite-plus's own version; from vite-plus 1.7.0 it follows
+  Vite's numbers (`8.3.8000`), so take the exact `vite` value from
+  `npm view vite-plus@<v> dependencies` (Panel #205, Nov 23). Dependabot bumps only
+  `@rollup/rollup-linux-x64-gnu`: move Panel's `rollup-win32-x64-msvc` pin with it. Upgrading it with npm: the old lock keeps `vite@8` on top and npm fails with a
   misleading `@vue/language-core` peer conflict; delete the toolchain entries from
   `package-lock.json` and reinstall. `vp migrate` switches the project to pnpm (reverted). Vite+
   1.x also needs vue-tsc 3.2/3.3: 3.3.12–3.3.14 break `types:check` on any `https://` in a
