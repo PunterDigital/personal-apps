@@ -58,6 +58,10 @@ To retire an app: open cards → Not Now with a comment, registry `status: "reti
   doesn't resolve `www.googletagmanager.com` (Nov 17), so specs that load the real Google tag
   (AniTrack `google-tag.spec.ts`) fail locally: rely on CI for them. No Go either: run Go
   in a `golang:<version from go.work>` container with the tree piped in (Arkeep `CLAUDE.md`).
+  The default `php` on `PATH` is pvm's `.bat` shim, which Node's `spawn`/`spawnSync` can't run
+  without a shell: a Laravel E2E `serve.mjs` then exits 1 with **no output** ("Process from
+  config.webServer was not able to start"). Set `PHP_BINARY` to the real `php.exe` under
+  `~/.pvm/versions/…` (or put that folder first on `PATH`, as the 8.4 export does) (MVM #5280).
 - **Shay games on this PC while runs happen.** Local E2E must never take focus from his window (Shay, Nov 14: ProjectTrucks
   test windows pulled him out of ETS2). Headless browsers are fine. Desktop E2E windows open unfocused and off the
   taskbar, with occlusion throttling off so they still render under a fullscreen game (ProjectTrucks
@@ -1060,7 +1064,9 @@ That script is now `scripts/pr-assets.mjs` here: `node scripts/pr-assets.mjs <re
 <png>…` (keeps the other card folders, checks the push is a fast-forward, and starts the orphan
 branch in a repo that has none yet: MCPacks had none, Nov 21).
 Right after `gh pr create`, `gh run list --branch <b>` can still be empty for a few seconds: wait
-for the run to appear before `gh run watch <id>` (an empty id fails at once, #5208).
+for the run to appear before `gh run watch <id>` (an empty id fails at once, #5208). On
+ShayPunter/minecraft-vps-manager it took about two minutes (#5280), with Actions "operational":
+check `actions/runs?head_sha=<sha>` again before deciding no run was made.
 
 **Backslashes reach Markdown and PHP tests too** (Panel #3084): the same loss hits CLAUDE.md sections and test files written via heredoc/`node -e`. Write them with the Write tool. Also: `cat > file` without a heredoc waits on stdin forever (add `</dev/null`), but never add
 `</dev/null` to a `cat > file <<EOF` line: the later redirect replaces the heredoc and writes an empty
