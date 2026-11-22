@@ -473,6 +473,13 @@ For each card in Triage:
 - An upstream branch that sat waiting for Shay's "go" goes stale: cherry-pick it onto current
   `upstream/develop` as a new branch (don't force-push the old one), rerun the suites, push the new branch and
   open the PR from it (#4560: 94 commits behind after 8 days).
+- A clean merge isn't a working merge: run `go vet` on every module after an upstream sync.
+  v0.12.1 changed `ReportDestinationResult`'s signature, which our #4568 patch calls; only vet
+  caught it (Arkeep #8, Nov 23). Workflows upstream adds register on the fork only once the
+  sync reaches `main`, and one whose own file is in its `push.paths` (`registry-metadata.yml`)
+  runs once on that merge (it failed at login, no secrets, nothing published). Right after each
+  sync merge, `gh workflow list --all` and disable anything that publishes (`agent-repository.yml`
+  is new in v0.12). Upstream's `.deb`/`.rpm` packages (pkg.arkeep.io) aren't built by the fork.
 - Pushing more than 3 tags at once fires no workflows, so the upstream tags went up in one push.
   The first `-pd` tag still fired upstream's `release.yml` (its tag check refuses `-pd` before
   any secret is used; it also auto-created an empty `release` environment); it's disabled since.
@@ -534,6 +541,9 @@ For each card in Triage:
   token of that login, the connector's OAuth grant included: if the connector starts
   answering 401 while `/version` is fine, that's the likely cause. Shay has to reconnect it;
   open a Needs Info card if a run finds it that way.
+  Its `release.yml` (softprops/action-gh-release, `generate_release_notes: true`) appends
+  generated notes to a release you created with `--notes-file`: once it finishes, run
+  `gh release edit vX --notes-file …` again (v1.6.0, Nov 23).
   Check the deploy with `curl https://app.groundstationhq.com/version`: its `commit` is the
   Publish run's `github.sha` (a build arg, #4454), so it moves on every merge, workflow-only
   ones included (`app.js`'s `Last-Modified` doesn't, #3838). Plus a working MCP call.
@@ -1234,7 +1244,9 @@ not picked up by the build step, and it moves to Done once all its pieces are re
   `project-trucks-hub` (format in that folder's README), check every fact against the code or
   release notes, open a PR, merge on green. The deploy turns it into a **draft**; open a Needs
   Info card assigned to Shay ("read and publish /blog/<slug> in Admin → Blog posts"). Shay
-  publishes; runs never do, unless he says otherwise on a card.
+  publishes; runs never do, unless he says otherwise on a card. When the post is about a
+  release on the same train, check `gh release view` again right before merging it: v0.12.0
+  came out while the Nov 23 post's PR was open and its wording had to change.
 - Check the last CI run on each `main` is green; investigate red.
 - `npm audit` (or equivalent) — high/critical findings become `bug` cards.
 - Dependabot runs that fail with `ERR_PNPM_NO_MATURE_MATCHING_VERSION` aren't config bugs: its release-age
@@ -1264,7 +1276,10 @@ not picked up by the build step, and it moves to Done once all its pieces are re
   `ConnectionException` handlers need no change.
 - TypeScript 7 (the native compiler) has no JS compiler API, so `vue-tsc` can't run on it
   ("typescript/lib/tsc" not exported). Projects with vue-tsc stay on TS 6.0 (the last JS release)
-  with a Dependabot `ignore: typescript >=7` (AniTrack extension, #3820).
+  with a Dependabot `ignore: typescript >=7` (AniTrack extension, #3820; MCPacks since Nov 23).
+- A red Nexus unit run with "Malformed OpenSSH private key" from `tests/fixtures/ssh-server.ts`
+  is ssh2's ed25519 keygen flake (about 0.4% of generated keys don't parse): rerun the failed
+  jobs before debugging the bump (Nexus #72, Nov 23; fix on card #5417).
 - Inertia 3 on an app with no published `config/inertia.php`: the package default turns SSR on
   and points page checks at lowercase `js/pages`, which can break `assertInertia()->component()`
   on Linux CI (unless the test passes `false` to skip the file check). Publish the config and set both (MDG #3821).
@@ -1277,6 +1292,9 @@ not picked up by the build step, and it moves to Done once all its pieces are re
   (recipe in its `CLAUDE.md`, "Dependency updates") (ProjectTrucks #2879).
 - The release train is a good fit for parallel sub-agents (one per project, release + maintenance,
   no board writes); the parent moves cards and rebuilds the downloads page once at the end.
+  A sub-agent that hands back mid-release (its own CI wait went to the background) can still
+  resume when that wait ends: if the parent takes over the remaining steps, `TaskStop` the agent
+  first so both don't merge or tag (GroundStation v1.6.0, Nov 23).
   A macOS job can also end red after 15 min with "The job was not acquired by Runner of type
   hosted even after multiple attempts" (no steps ran): GitHub capacity, not the code.
   `gh run rerun <id> --failed` (Nexus #71, Nov 18: passed on the rerun).
