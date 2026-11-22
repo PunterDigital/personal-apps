@@ -848,6 +848,12 @@ For each card in Triage:
   first. `getByRole('checkbox', { name })` matches the whole `<label>` text, so a label with a
   description span needs an `aria-label` on the input. A `page.goto` to a 403/404 logs a Chrome
   console error: assert `collectErrors()` before such visits (Panel #3080).
+- Fortify's login limiter allows 5 attempts a minute per email + IP, and a single-worker
+  E2E run gets there fast if specs sign the same seeded admin out and back in: the next
+  login stays on /login. Sign the admin in once per test and give the second user (player,
+  guest) a `browser.newContext()`. Check which accounts an earlier spec deletes, too: MVM's
+  accounts.spec deletes `player@example.com`, so a later spec failing to sign in as it is
+  that, not the limiter (MVM #5282).
 - Panel has no ParaTest, so `php artisan test --parallel` fails at once (Collision "requires
   ParaTest"): run the suite serially in a `run_in_background` Bash call (~5 min, 990 tests).
   A second card can be tested in a scratchpad worktree at the same time (own `composer install`,
