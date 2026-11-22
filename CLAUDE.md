@@ -882,6 +882,12 @@ For each card in Triage:
 - A new Filament form field whose label contains an existing one ("Public headline" next to "Headline") breaks
   every older spec that uses `getByRole('textbox', { name: 'Headline' })` (strict mode, 2 elements) but
   not the new spec: add `exact: true`, and grep `tests/e2e` for the old label before pushing (Panel #3087).
+  Seed **data** can do the same: an E2E server named "Named Server" gave its list row's buttons
+  `aria-label="Edit Named Server"`, and a later spec's `getByLabel('Name')` (no `exact`), run
+  while the list was still showing, matched them. Only the full suite caught it; the new spec
+  passed alone. Keep words like Name/Slug/Type out of E2E record names (MVM #5338).
+- A "Connected" message after only fetching an SFTP host key misleads: the key comes before
+  any sign-in. Sign in as its own step and report a refusal as one (MVM #5348).
 - A required-field asterisk inside a `<label>` (even `aria-hidden`) breaks `getByLabel(name, { exact: true })`:
   Playwright matches the label's text, asterisk included, though the accessible name is unchanged. Use
   `getByRole('combobox', { name, exact: true })` (Panel `apply.spec.ts`, #3970). A Filament modal footer button
