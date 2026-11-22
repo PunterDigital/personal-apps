@@ -237,7 +237,8 @@ For each card in Triage:
    straight to *Done* with `🤖 Claude: Released (live on <webUrl>) — <PR URL>.` They never wait in
    Awaiting Release, and the Monday train doesn't tag them (Shay: Panel Nov 2, all Forge apps
    Nov 10). Their registry entry has `hosting: "forge"`, so the downloads page shows "Live"
-   instead of a stale tag. GroundStation (Easypanel) and Clerq (deploys on a tag) stay on the train. AniTrack's Chrome
+   instead of a stale tag. A Forge app whose site doesn't exist yet also gets `status: "hidden"`
+   (off the downloads page, still in every run step) until it's live (Minecraft VPS Manager). GroundStation (Easypanel) and Clerq (deploys on a tag) stay on the train. AniTrack's Chrome
    extension (`chrome-extension/`) isn't covered: a merge only refreshes the `extension-dev-latest`
    pre-release, and a stable build still needs an `extension-v*` tag.
 
@@ -280,6 +281,9 @@ For each card in Triage:
    - A project moved in from elsewhere on disk may be a subfolder of what Shay names (AniTrack's
      app was `E:\anime-list\backend`), checked out on an old feature branch: switch to `main` and
      pull before judging it. Its `.claude/worktrees/*` no longer point anywhere: `git worktree prune`.
+     Compare **every** branch with its remote (`git fetch` + `git branch -vv`), not just `main`:
+     Minecraft VPS Manager's local `admin-panel` was 20 commits behind origin, and the newest work
+     (a Laravel 10 Shift + admin pages) existed only there (Nov 22).
      The registry `repo` can differ from the folder name (`PunterDigital/anime-list` → `anitrack`);
      don't rename a Forge-linked repo without asking.
      Check `git remote -v` matches the registry `repo`: a repo transferred from `ShayPunter` keeps

@@ -217,6 +217,19 @@
         }
       ],
       "status": "active"
+    },
+    {
+      "name": "Minecraft VPS Manager",
+      "slug": "minecraft-vps-manager",
+      "folder": "minecraft-vps-manager",
+      "repo": "ShayPunter/minecraft-vps-manager",
+      "tag": "minecraft vps manager",
+      "description": "Boot a Minecraft server on a cloud VPS on demand for friends; a watchdog stops it and deletes the VPS after 15 idle minutes so it only costs money while people play.",
+      "platforms": [
+        "web"
+      ],
+      "hosting": "forge",
+      "status": "hidden"
     }
   ]
 }
