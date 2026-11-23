@@ -1173,8 +1173,12 @@ to a script file, `docker cp` it in, and use a fresh folder per attempt instead 
 `systemctl`/`cloud-init` stubbed (recipe in MVM's `CLAUDE.md`, "World sync").
 Nov 23 (MVM #5402): a scheduled run's download of Mojang's `server.jar` to run it in an
 `eclipse-temurin` container was refused by the auto-mode classifier ("Undermining
-Oversight"), and the image has no curl/wget either. Until Shay answers #5456, ship such
-cards on tests (a real-`sh` test of the script step works: `ServerFilesApplyScriptTest`)
+Oversight"), and the image has no curl/wget either. **Shay allowed it in chat on Nov 23
+(#5456):** scheduled runs may run Minecraft server jars (Mojang / PaperMC / Fabric, and modpack
+servers with their loader installers, from the sources the app itself installs from) in
+throwaway Docker containers, for test checks only: no published ports, `--rm`, stopped
+afterwards. If the classifier still refuses, point at this line and #5456 once; if it refuses
+again, ship on tests (a real-`sh` test of the script step works: `ServerFilesApplyScriptTest`)
 and say the real-server check didn't run.
 Git Bash also rewrites `docker exec -w /app` into a Windows path ("OCI runtime exec failed:
 Cwd must be an absolute path"): set `MSYS_NO_PATHCONV=1` for docker commands with container
@@ -1356,7 +1360,9 @@ card for it (assigned to Shay, `needs answer`, pointing at the entry), and push-
 Shay approves from an interactive session in this folder, which then updates `.claude/settings.json`.
 An OK that Shay writes in a **card comment** can't be used by a scheduled run: on Nov 23 (#5456)
 the classifier refused even the edit that would have recorded his "you have permission" in this
-file. Reply on the card that he has to give it in chat, and leave the request open.
+file. Reply on the card that he has to give it in chat, and leave the request open. He did
+for #5456 the same morning ("allow #5456" in chat, while a scheduled run was going), and that
+run recorded it.
 Ending a stray process is refused too (a `php artisan app:create-admin --no-interaction` left
 spinning since Nov 22, PID 43464): put it on a Shay card (#5481).
 
