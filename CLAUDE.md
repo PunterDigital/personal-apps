@@ -940,6 +940,24 @@ For each card in Triage:
   Google compares, so add the file to `fmt.ignorePatterns` in `vite.config.ts`. In a Vite+ project,
   format with `npm run check:fix`: a bare `npx prettier --write` ignores the `fmt` settings
   (it switched a spec to double quotes).
+- Security audits (#5472, Nov 23): one read-only sub-agent per app with a checklist brief, the
+  parent curls the live sites (headers, cookies, `openssl s_client -tls1 -cipher
+  'DEFAULT@SECLEVEL=0'`, since a bare `-tls1` fails client-side on OpenSSL 3.5 and Windows
+  curl's `--tls-max` doesn't test it either). Verify each high finding in the code yourself
+  before calling it critical. Two came back real and shipped as hotfixes the same run:
+  MCPacks' quarantine left the zip public-read on the bucket (#5517), and the Hub's stateless
+  Steam OpenID callback linked whoever's Steam came back (#5519). Any "status = held" change
+  on a file that's served from a bucket needs its object ACL changed too, and any OpenID or
+  OAuth flow with `stateless` needs its own session state carried in the return URL.
+- `Storage::fake()`'s local disk can't store visibility on Windows (file modes): a
+  `getVisibility()` test reads `public` after `setVisibility('private')` here and passes on
+  Linux CI. Run such tests in `php:8.4-cli` (+ `docker-php-ext-install zip` after
+  `apt-get install libzip-dev`) with the tree piped in (MCPacks #5517).
+- Under `Socialite::fake()` the driver is a `FakeProvider` (it implements the `Provider`
+  contract and forwards other calls), not an `AbstractProvider`: a helper typed
+  `: AbstractProvider` (added to quiet PHPStan's "undefined method redirectUrl()") fails
+  every faked test with a TypeError. Return the contract and put the `@var AbstractProvider`
+  on a local (Hub #5519).
 - Hard-deleted records leave history only in an audit log: MCPacks' analytics (#5194) count
   deleted packs from the `delete` rows' metadata (created_at, size, reason). Check what the delete
   path logs before promising a backfill, and never prune those rows.
