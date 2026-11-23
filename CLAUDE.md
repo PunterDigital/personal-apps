@@ -1169,6 +1169,11 @@ can't read the inner script) and an unattended run has nobody to approve it: wri
 to a script file, `docker cp` it in, and use a fresh folder per attempt instead of `rm`
 (MVM #5288). Shell scripts meant for a VPS can be checked in an `ubuntu:24.04` container with
 `systemctl`/`cloud-init` stubbed (recipe in MVM's `CLAUDE.md`, "World sync").
+Nov 23 (MVM #5402): a scheduled run's download of Mojang's `server.jar` to run it in an
+`eclipse-temurin` container was refused by the auto-mode classifier ("Undermining
+Oversight"), and the image has no curl/wget either. Until Shay answers #5456, ship such
+cards on tests (a real-`sh` test of the script step works: `ServerFilesApplyScriptTest`)
+and say the real-server check didn't run.
 Git Bash also rewrites `docker exec -w /app` into a Windows path ("OCI runtime exec failed:
 Cwd must be an absolute path"): set `MSYS_NO_PATHCONV=1` for docker commands with container
 paths. A long-lived `php:8.4-cli` container (`docker run -d --rm … sleep 3600`, ext-zip added
