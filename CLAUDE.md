@@ -949,6 +949,16 @@ For each card in Triage:
   Steam OpenID callback linked whoever's Steam came back (#5519). Any "status = held" change
   on a file that's served from a bucket needs its object ACL changed too, and any OpenID or
   OAuth flow with `stateless` needs its own session state carried in the return URL.
+- Account hardening recipe (#5532, Panel/Hub/MDG/MVM): Fortify's `POST /register` and
+  `/forgot-password` have no limiter; Panel and the Hub use `ThrottleAccountRequests` (web
+  group, by route name, the form's email error instead of a 429), Breeze (MDG) named limiters
+  with a `->response()` back to the form. `AuthenticateSession` in the web group signs other
+  sessions out on a password change/reset (test: `withSession(['password_hash_web' => $old])`
+  → redirect to login). Fortify's and Breeze's forgot-password both say "We can't find a
+  user": bind `FailedPasswordResetLinkRequestResponse` to the success response. The email
+  change's "Current password" field needs its own id on Breeze's profile page: its password
+  form already has `#current_password`. An email change unverifies the account, so an E2E
+  that logs in with the new address lands on `/verify-email` first.
 - `Storage::fake()`'s local disk can't store visibility on Windows (file modes): a
   `getVisibility()` test reads `public` after `setVisibility('private')` here and passes on
   Linux CI. Run such tests in `php:8.4-cli` (+ `docker-php-ext-install zip` after
