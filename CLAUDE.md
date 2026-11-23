@@ -1304,6 +1304,13 @@ not picked up by the build step, and it moves to Done once all its pieces are re
 - Check a major's licence before merging, even with green CI: `npm view <pkg>@<v> license`
   (and the tarball's LICENSE). PrimeVue 5 went from MIT to a commercial PrimeUI licence that
   needs a key (`@primeui/license-manager` dependency); a licence change is Shay's call (AniTrack #4252).
+- Guzzle sends a request with `stream => true` to its **stream** handler (when `allow_url_fopen` is
+  on), which ignores every `curl` option and ties the TLS peer name to the URL host. So pinning an
+  address against DNS rebinding (`CURLOPT_RESOLVE`, `CURLOPT_PREREQFUNCTION` on PHP 8.4) needs
+  `Http::setHandler(new CurlHandler(['transport_sharing' => 'none', 'max_idle_handles' => 0]))`
+  and no `stream`; cap the body with a `progress` callback instead. `Http::fake` never opens a
+  socket: check curl options through the fake callback's `$options`, and test the pin for real
+  against a `php -S` server on 127.0.0.1 (MCPacks `PackUrlFetcherPinningTest`, #5522).
 - Guzzle 7 → 8: a read timeout is no longer a `ConnectException` (now `NetworkTimeoutException`;
   a timeout after the headers is `ResponseTimeoutException`). Code that retries on
   `ConnectException` stops retrying timeouts while CI stays green. Catch
