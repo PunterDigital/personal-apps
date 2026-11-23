@@ -949,6 +949,15 @@ For each card in Triage:
   Steam OpenID callback linked whoever's Steam came back (#5519). Any "status = held" change
   on a file that's served from a bucket needs its object ACL changed too, and any OpenID or
   OAuth flow with `stateless` needs its own session state carried in the return URL.
+  Node apps (#5473): Clerq's better-auth `mcp()` plugin (1.6.x) only shows the consent page
+  when the authorize link says `prompt=consent`, and dynamic client registration takes any
+  redirect URI, so a link gave out MCP tokens (#5579, hotfix v1.10.1). Clerq's
+  `hooks.before` (`forceMcpConsent`, `server/auth.ts`) forces it; a returned
+  `{ context: { query } }` replaces the endpoint's query. Recheck after the better-auth 1.7
+  move (#2877). Check any OAuth server for "code without consent" first.
+  Playwright's `playwright.request.newContext()` inherits the test's `use.storageState`:
+  pass `storageState: { cookies: [], origins: [] }` for a cookie-less client. better-auth
+  refuses a POST that carries cookies but no Origin (`MISSING_OR_NULL_ORIGIN`).
 - Account hardening recipe (#5532, Panel/Hub/MDG/MVM): Fortify's `POST /register` and
   `/forgot-password` have no limiter; Panel and the Hub use `ThrottleAccountRequests` (web
   group, by route name, the form's email error instead of a 429), Breeze (MDG) named limiters
