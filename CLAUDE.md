@@ -541,6 +541,13 @@ For each card in Triage:
   token of that login, the connector's OAuth grant included: if the connector starts
   answering 401 while `/version` is fine, that's the likely cause. Shay has to reconnect it;
   open a Needs Info card if a run finds it that way.
+  A GroundStation HTTP test whose last requests fetch blobs (`/rich-text/attachments/N`)
+  crashed after every check passed, on MySQL/MariaDB only: express-session touches the
+  session at the end of the response, after the client already has all the bytes, and
+  `t.close()` had shut the pool by then ("Pool is closed", then ERR_HTTP_HEADERS_SENT).
+  Reading the body isn't enough: `await new Promise(r => t.server.close(r))` (capped) before
+  `t.close()`. Check such tests on MySQL locally (compose `mysql` + the piped
+  `node:24-bookworm-slim` recipe below) before pushing; SQLite never shows it (#5581).
   Its `release.yml` (softprops/action-gh-release, `generate_release_notes: true`) appends
   generated notes to a release you created with `--notes-file`: once it finishes, run
   `gh release edit vX --notes-file …` again (v1.6.0, Nov 23).
@@ -568,6 +575,11 @@ For each card in Triage:
   seed, build and Playwright inside `mcr.microsoft.com/playwright:v<version>-noble` on a Docker
   network with the DB (recipe in Clerq's local `CLAUDE.md`).
 - Clerq gitignores `CLAUDE.md`/`.claude/` on purpose: its project notes stay local, uncommitted.
+- Clerq E2E as a non-owner without a second sign-in (Better Auth allows 3 sign-ins per 10 s):
+  insert a second business with the demo account as a member, point `user_active_business`
+  at it, restore it in `afterAll`. `page.request.post('/api/trpc/<proc>', { data: { json: … } })`
+  (superjson) reaches tRPC with the page's cookies, a cheap check of a server-side refusal.
+  shadcn's `CardTitle` is a `div`: `getByRole('heading')` never finds it (#5582).
 - Clerq's only API is MCP JSON-RPC (`POST /api/mcp`, `tools/call`; the `Accept` header must list
   `application/json, text/event-stream` or it answers 406). Its bearer tokens are better-auth `mcp()`
   OAuth tokens that expire after 1 hour, so another app can't use a static token (#3330).
@@ -955,6 +967,9 @@ For each card in Triage:
   `hooks.before` (`forceMcpConsent`, `server/auth.ts`) forces it; a returned
   `{ context: { query } }` replaces the endpoint's query. Recheck after the better-auth 1.7
   move (#2877). Check any OAuth server for "code without consent" first.
+  Findings that are real security bugs (a data leak, a privilege escalation) get
+  `priority: critical` and ship as hotfixes (release cadence), not `high` for the train:
+  the Nov 23 audit run tagged #5581/#5582 high and the next run retagged them.
   Playwright's `playwright.request.newContext()` inherits the test's `use.storageState`:
   pass `storageState: { cookies: [], origins: [] }` for a cookie-less client. better-auth
   refuses a POST that carries cookies but no Origin (`MISSING_OR_NULL_ORIGIN`).
@@ -1177,6 +1192,12 @@ so commit the stacked work, then `git reset --soft main` and commit again: the i
 the stacked changes. Run `git add -A` and check `git status` before any such squash commit:
 edits made after the last `git add` are silently left out (Panel #3201: a Pint fix and CLAUDE.md
 missed the push, CI went red on Pint).
+Squashing WIP commits: `git reset --soft` to the branch's **own base** (`git merge-base HEAD
+origin/main`), never to `origin/main`. Worktrees share refs with the main checkout, so another
+session's fetch can move `origin/main` mid-card; a soft reset onto the moved ref keeps your old
+tree, and the commit silently reverts whatever merged in between (MVM #5620: it undid #5527, caught
+in `git show --stat` before the push). Squash onto the base, then `git rebase origin/main`, and
+look at `git diff --stat origin/main HEAD` for files you never touched.
 A stacked PR whose base is the first PR's branch is **closed for good** when that branch is
 deleted on merge (GitHub did not retarget it, and a closed PR can't change base or reopen:
 Nexus #36 → #37). Before merging the base PR, `gh pr edit <stacked> --base main` (the squash
