@@ -866,7 +866,9 @@ For each card in Triage:
   login stays on /login. Sign the admin in once per test and give the second user (player,
   guest) a `browser.newContext()`. Check which accounts an earlier spec deletes, too: MVM's
   accounts.spec deletes `player@example.com`, so a later spec failing to sign in as it is
-  that, not the limiter (MVM #5282).
+  that, not the limiter (MVM #5282). A new test in a spec file whose other tests already sign
+  the same admin in gets its own seeded admin: MVM's servers.spec passed locally (slow PC)
+  but its fifth `admin@example.com` login in a minute stayed on /login in CI (#5462).
 - Panel has no ParaTest, so `php artisan test --parallel` fails at once (Collision "requires
   ParaTest"): run the suite serially in a `run_in_background` Bash call (~5 min, 990 tests).
   A second card can be tested in a scratchpad worktree at the same time (own `composer install`,
@@ -1243,6 +1245,10 @@ not picked up by the build step, and it moves to Done once all its pieces are re
   (fixed in Hub #32). A red test on a Monday with an untouched diff: look for a hard-coded date first.
 - Deploys without a hashed asset: GroundStation's `/version` commit (#4454); for a Forge app whose bump leaves the hash unchanged, `/build/manifest.json`'s
   `Last-Modified` still moves (MDG, Nov 2).
+- Upstream PRs and issues we opened (`gh pr list -R <upstream> --author @me --state all`,
+  same for issues): note each one's fate on its card (merged, changes asked, closed, a design
+  answer that unblocks a held card). Arkeep: PR #504 (#4569), issues #501–#503 (#4569, #4568,
+  #4567), opened Nov 23.
 - Forks (registry `upstream`, e.g. Arkeep): if upstream has a newer release than our last
   `-pd` base, open a `claude/sync-vX.Y.Z` PR merging that tag (merge commit), then release
   `vX.Y.Z-pd.1` on the train. A conflict with one of our patches becomes a card.
@@ -1348,6 +1354,11 @@ Scheduled runs cannot ask for approval. If a run is blocked by a permission prom
 `ops/permission-requests.md` (tool, exact command, why it was needed, how often), open a Needs Info
 card for it (assigned to Shay, `needs answer`, pointing at the entry), and push-notify Shay.
 Shay approves from an interactive session in this folder, which then updates `.claude/settings.json`.
+An OK that Shay writes in a **card comment** can't be used by a scheduled run: on Nov 23 (#5456)
+the classifier refused even the edit that would have recorded his "you have permission" in this
+file. Reply on the card that he has to give it in chat, and leave the request open.
+Ending a stray process is refused too (a `php artisan app:create-admin --no-interaction` left
+spinning since Nov 22, PID 43464): put it on a Shay card (#5481).
 
 ## Rules of engagement
 
