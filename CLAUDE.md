@@ -317,7 +317,10 @@ For each card in Triage:
    macOS (`.dmg`, universal or arm64+x64) artifacts, create the GitHub Release, attach assets.
    Web apps: deploy (GitHub Pages or wherever the app is hosted) and set `webUrl` in the registry.
 7. **Repo settings.** Branch protection on `main` requiring CI; Dependabot (npm + github-actions, weekly);
-   squash merge only; delete branch on merge.
+   squash merge only; delete branch on merge. Default workflow token **read** and Actions not
+   allowed to approve PRs (first check every active workflow declares its own `permissions:`),
+   a tag ruleset on the release-tag pattern (admin bypass), secret scanning + push protection
+   on (Arkeep had none of these, #5475/#5618).
 8. **E2E.** If the project has no E2E tests, add a Playwright smoke test covering launch + core flow.
    Desktop apps must support an isolated profile for tests (env var → `app.setPath('userData', …)`)
    so tests never touch Shay's real data. Run the E2E against the packaged app too, not just dev.
@@ -983,6 +986,29 @@ For each card in Triage:
   change's "Current password" field needs its own id on Breeze's profile page: its password
   form already has `#current_password`. An email change unverifies the account, so an E2E
   that logs in with the new address lands on `/verify-email` first.
+  Two follow-ups (Nov 23–24): an app whose API lives in `routes/web.php` behind
+  `auth:sanctum` 500s every API call with `AuthenticateSession` (Sanctum's RequestGuard
+  becomes the default guard and the base class calls `viaRemember()`): use a subclass that
+  skips when the guard isn't a `SessionGuard` (AniTrack `App\Http\Middleware\AuthenticateSession`,
+  #5529). And every E2E sign-up comes from 127.0.0.1, so per-IP account limits need lifting
+  for E2E (Panel `tests/e2e/env.ts`: `AUTH_REGISTER_PER_HOUR`, `AUTH_PASSWORD_RESETS_PER_MINUTE`).
+- **Behind Cloudflare, trust Cloudflare's ranges** (#5703): all six Forge apps answer through
+  Cloudflare, and Laravel's TrustProxies trusts `*` only on `*.on-forge.com` hosts, so on a
+  custom domain `$request->ip()` was the Cloudflare edge and every per-IP limit was shared by
+  everyone behind it. Each app now has MCPacks' `config/trustedproxy.php` (Cloudflare's IPv4/IPv6
+  ranges) with X-Forwarded-For | X-Forwarded-Proto only (Cloudflare passes a client's
+  X-Forwarded-Host through), plus a `TrustedProxyTest`. A new Laravel app gets the same.
+- **Inertia SSR on Forge can serve a stale bundle** (AniTrack #5704/#5807): `/version` and the
+  asset hash only prove PHP and the client bundle deployed. After any Vue markup change, check
+  the live server HTML for the change too; the only other sign is "Hydration completed but
+  contains mismatches" in the console. The fix (restart the SSR daemon, `inertia:stop-ssr` after
+  `$ACTIVATE_RELEASE()`) needs Shay in Forge.
+- Security headers from the app (#5533): HSTS 1 year (no preload), CSP `frame-ancestors`,
+  `base-uri 'self'`, `object-src 'none'`, nosniff, Referrer-Policy, Permissions-Policy; no
+  X-Frame-Options from the app (Forge's nginx already sends SAMEORIGIN, two would conflict).
+  MDG uses `frame-ancestors 'self'` because its home page frames `/grid/shaypunter`.
+  Permissions-Policy may only list features Chromium knows: an unknown one (`interest-cohort`)
+  is a console error and fails every E2E fixture that checks the console.
 - `Storage::fake()`'s local disk can't store visibility on Windows (file modes): a
   `getVisibility()` test reads `public` after `setVisibility('private')` here and passes on
   Linux CI. Run such tests in `php:8.4-cli` (+ `docker-php-ext-install zip` after
@@ -1281,6 +1307,121 @@ Comments are sanitized HTML: an angle-bracket placeholder like `<email>` disappe
 **Card ordering note.** An L card that's been split stays in Ready *on hold* as the tracker. It is
 not picked up by the build step, and it moves to Done once all its pieces are released.
 
+## Team runs (many agents at once)
+
+Shay can ask an interactive session to clear the whole Ready column with a team of agents
+(Nov 23–24: two waves, ~20 agents, ~70 cards in ~4 hours). What worked:
+- **Lock handover.** If a scheduled run holds the lock, ask that session (SendMessage) to finish
+  its card and start no other, then take the lock when it lets go (a background loop that waits
+  for the file to go, then rewrites it every 30 min with "interactive batch" in it). A run's
+  session may leave its lock behind after it finishes: check `list_sessions`, then take it.
+  Remove the lock at the end so the next scheduled run picks up what's left in Testing & CI.
+- **One agent per project**, never two in one checkout; one agent can take several small apps.
+  Cross-project cards (#5533, #5703) get one part per app agent, and the parent moves the card.
+  A shared brief file in the scratchpad (rules, columns, port range per agent, report format)
+  keeps prompts short. The parent owns the lock, run log, playbook, releases and notifications;
+  agents report lessons instead of editing this file. Agents should make no production writes
+  for checks (#5759: a test pack was uploaded and deleted on mcpacks.dev).
+- **Port ranges per agent** (Hub 8210+, not 8200: Duplicati's tray app holds 8200 on this PC).
+- **Waiting:** an agent hands back while its CI wait runs in the background and resumes by
+  itself; don't resend. An agent that already finished picks up a SendMessage by resuming.
+  The concurrent sub-agent limit is 20: with ~10 build agents, an auditor's own reviewers hit it.
+- **Shared self-hosted runner** (Panel, GroundStation, MCPacks): it ran two Panel jobs at once,
+  and Panel's E2E then failed 4–7 random specs on timing (logins 3–5 s). Keep one CI run in
+  flight per private repo, cancel superseded runs (and main's post-merge CI when the tree equals
+  the PR run's, keeping Publish), and push Panel PRs one at a time. GroundStation merges took
+  20–40 min to deploy that night.
+- **This PC under load:** two projects can't run Gradle managed-device tests at once (shared
+  AVD), and the emulator crashed in 3 of 5 runs: filter with
+  `-Pandroid.testInstrumentationRunnerArguments.class=<class>`. Local E2E logins time out:
+  rerun the failed specs alone. Absolute timings (FCP, startup) are noise: compare with an
+  interleaved A/B in one script. Don't wait on `tasklist | grep cargo`: other agents' builds
+  keep it busy.
+- **Wind-down:** "finish what you're on and push" means no new cards. "Stop now" means push the
+  WIP, merge nothing, and leave a status comment on every card touched. A merge made before the
+  stop message can't be undone, so send the stop message before anything goes green.
+- **Audits** opened ~40 cards in one evening. Shay wanted them built the same night: the highs
+  first, then everything else in a second wave.
+
+**Lessons from that night, by stack**
+- *Laravel:*
+  - A password-confirmed check must be route middleware, because a FormRequest validates before the controller (#5529).
+  - Attributes a controller sets on its FormRequest don't reach route middleware (it's a copy): use `request()->attributes` (#5525).
+  - `JsonResource::resolve()` keeps nested resources holding their models: `json_encode`/`json_decode` before caching took one entry from 834 to 81 KB (#5709).
+  - A Sanctum-token test stays signed in as the first token's user: `$this->app['auth']->forgetGuards()` before each other token (#5732).
+  - An Inertia prop must be a closure for a partial reload to skip it (#5731).
+  - Ziggy's `@routes` list lasts the whole document, so don't filter it per user (#5710).
+  - Inertia `<Head>` turns `v-html` on a script into an `innerHTML` attribute (the JSON-LD was always empty): use a text child with `<` escaped as `<` (#5525).
+  - Blade `@js([...])` prints `JSON.parse('…')`: for inline gtag arguments use `json_encode(..., JSON_HEX_TAG|JSON_HEX_AMP|JSON_HEX_APOS)` (#5529).
+  - Model-event cache invalidation misses mass `->delete()` / `->update()`: forget explicitly (#5732).
+  - A page cache under a minute passes local E2E but fails CI: make the TTL configurable and 0 for E2E (#5734).
+  - An index on a column a rollback test drops fails on SQLite (#5734).
+  - A scratch worktree with a junctioned `vendor/` runs the main checkout's `app/` code: give it its own `composer install` (#5533).
+  - `Markdown::withSecuredEncoding()` keeps `[text](url)` typed by users from becoming links in mail (#5531).
+  - Fortify's 2FA replay cache is keyed by the code alone: E2E users signing in with TOTP in the same minute need different secrets (#5432).
+  - PHPUnit 13 needs PHP 8.4.1+, and with dev packages any artisan on 8.3 fails: run `composer check-platform-reqs --no-dev --lock` against the server's PHP first (#5432).
+  - `vp check` exits 1 on lint warnings too (#5733).
+  - A Vue `<script setup>` comment containing a closing script tag ends the block (#5525).
+  - A JSON lookup called with `fetch()` should answer 200 with an error field: a 4xx is a console error that fails E2E fixtures (#5228).
+  - TruckersMP's API answers a browser-like User-Agent with a Cloudflare challenge; a plain UA gets JSON (#5228).
+  - en-GB `Intl` zero-pads the day with a numeric month while PHP's `j` doesn't, so date-matching specs fail on the 1st–9th (Panel 88f516f).
+  - Panel's runner PHP GD has no WebP: check `imagetypes() & IMG_WEBP` (#5726).
+  - With ext-gmp (CI only), jenssegers/imagehash `toHex()` returns `""` for an all-zero hash: build hex from `toBits()` (#5853).
+  - Flat textures all hash to pHash "0", so degenerate hashes must never be blocklisted or matched (#5853).
+  - Inertia SSR `cluster: true` forks a worker per CPU (24 here): keep local E2E single-process (AniTrack `INERTIA_SSR_CLUSTER`) (#5717).
+  - On three Cloudflare zones, hashed `/build/assets` get only `max-age=14400` (Cloudflare's default) (#5723, Shay's card).
+  - Version assets by content hash, not `filemtime()`: zero-downtime deploys reset mtimes (#5733).
+  - OpenSSH 9.8+ penalises refused connections from one IP: keep a shared CI sshd's test connections few (#5527).
+  - Cloud-init `ssh_keys` can be checked in `ubuntu:24.04` with a NoCloud seed (#5527, MVM `CLAUDE.md`).
+  - MVM E2E: set `TEMP`/`TMP` per checkout (#5752). One local start timeout can leave servers at the 2-server cap and fail later specs (#5753).
+  - Inertia polls under `page.clock`: wait for each poll's response before moving the clock on (#5753).
+- *Node (GroundStation, Clerq):*
+  - GroundStation tests require config-reading modules only after `bootTestApp()` (#5585).
+  - GroundStation E2E uses `data-test` (#5682), and specs that add many Done cards use "Mobile App v2" (#5682).
+  - After an autosubmit form, wait for `framenavigated` before the next `goto` (#5586).
+  - Compression skips HEAD: check with `curl -s -o /dev/null -D -` (#5684). Easypanel doesn't compress, so the app must.
+  - tRPC 11 `createCallerFactory` runs the context per call: wrap it in React `cache()` (#5694).
+  - Count queries and fetches per request with a `node -r preload.cjs` that patches pg and fetch (#5694).
+  - Next 16/Turbopack prints no first-load JS: sum the page's script chunks (#5695).
+  - Next 16 RSC fetches need `rsc: 1` plus `_rsc` (#5693).
+  - pdfjs-dist 6 needs no `'unsafe-eval'` (#5584).
+  - Clerq's non-required `einvoice` job can 429 on a download: rerun, then merge on the required checks (#5694).
+  - Release notes: Clerq refuses the compose default `BETTER_AUTH_SECRET` on a real URL (#5584), and adds migration 0033 (#5689).
+- *Electron (Nexus):*
+  - With the RunAsNode fuse off, `ELECTRON_RUN_AS_NODE=1 Nexus.exe` starts the **real app on Shay's real profile** (#5612, it happened once): test fuses with a test profile only.
+  - electron-builder's `electronFuses` runs after afterPack and breaks an ad-hoc mac signature: call `addElectronFuses` inside afterPack before `codesign` (#5612).
+  - Electron 45's Node has no `crypto.argon2`: use libsodium in a worker thread (#5661).
+  - vitest can't `require()` TS sources, so keep lazy requires out of modules the tests build directly (#5665).
+  - Test SFTP servers answer READDIR in batches of ~100 (#5667), and have `virtualFiles` for names Windows can't store (#5610).
+  - Pause tests on a pipelined transfer wait until the size stops changing (#5659).
+  - Toasts across two quick syncs: wait for the first to go (#5611).
+- *Tauri (ProjectTrucks):*
+  - E2E needs an e2e-feature build: `pnpm tauri build --no-bundle --features e2e`. Release binaries ignore every test hook (#5614).
+  - The fixture's `dataDir` is the parent of the app's data dir (#5613).
+  - `codegen-units = 1` + `strip` (no LTO) gave the smallest installer; thin LTO was bigger and fat LTO cost 6–8 min a build (#5670).
+  - WAL isn't safe where restore means copying a backup over the `.db` (#5670).
+- *Android (World Explorer):*
+  - `PackageInstaller.abandonSession` is async (#5616).
+  - `Intent.removeFlags` needs API 26: use `flags and X.inv()` (#5616).
+  - Mock fixes keep the `Location.time` the test sets (#5672). A stationary check needs min update distance 0 (#5672).
+  - Seed big tables with `@Insert insertAll` (#5676).
+  - Room `QueryCallback` counting: trim the SQL and count outermost transactions (#5676).
+  - `additionalTestOutputDir` copies screenshots off the managed device (#5674).
+  - `Debug.startAllocCounting` still works on API 37 (#5674).
+  - The release after the next one is the first live test of the new install path (#5616).
+- *Go (Arkeep):* a new advisory (GO-2026-6278) turns govulncheck red on every branch at once: check main's last Security run and upstream before debugging a PR (#5618, card #5922).
+- *Shell / tools:*
+  - Heredoc- and `node -e`-written edit scripts lost backslashes again in five agents: Write tool only.
+  - A `| tail` hid a failing exit code (#5733).
+  - A junctioned `node_modules` in a scratch worktree: `cmd //c rmdir <junction>` (no `/s`) before `git worktree remove` (#5583).
+  - Git Bash rewrites `/login`-style arguments: `MSYS_NO_PATHCONV=1` (#5684).
+  - `gh pr merge --delete-branch` from another branch leaves the local branch (#5689).
+  - Diff a Dependabot branch's `package.json` against main before taking it (#5418).
+  - `python3 - <<EOF` still hangs here.
+  - No `cargo-audit` here: judge Rust advisories from `Cargo.lock` or run it in a `rust` container (#5474).
+  - A stuck process can't be ended by a run (Stop-Process refused): put it on a Shay card (World Explorer Gradle worker, Nov 24).
+  - Prove "looks the same" with `animations: 'disabled'` screenshots compared pixel by pixel (#5750).
+
 ## Weekly maintenance (Monday run, before the release train)
 
 - Review and merge green Dependabot PRs (patch/minor); majors become cards.
@@ -1360,9 +1501,10 @@ not picked up by the build step, and it moves to Done once all its pieces are re
 - TypeScript 7 (the native compiler) has no JS compiler API, so `vue-tsc` can't run on it
   ("typescript/lib/tsc" not exported). Projects with vue-tsc stay on TS 6.0 (the last JS release)
   with a Dependabot `ignore: typescript >=7` (AniTrack extension, #3820; MCPacks since Nov 23).
-- A red Nexus unit run with "Malformed OpenSSH private key" from `tests/fixtures/ssh-server.ts`
-  is ssh2's ed25519 keygen flake (about 0.4% of generated keys don't parse): rerun the failed
-  jobs before debugging the bump (Nexus #72, Nov 23; fix on card #5417).
+- Nexus "Malformed OpenSSH private key" from the test SSH server is fixed (#5417, nexus-ssh #74):
+  ssh2 1.17's ed25519 keygen drops a leading 0x00 from the public key (1 in 256). Test keys come
+  from the fixture's `generateEd25519KeyPair()`, never `utils.generateKeyPairSync('ed25519')`
+  directly; if the error comes back, look for a new direct call.
 - Inertia 3 on an app with no published `config/inertia.php`: the package default turns SSR on
   and points page checks at lowercase `js/pages`, which can break `assertInertia()->component()`
   on Linux CI (unless the test passes `false` to skip the file check). Publish the config and set both (MDG #3821).
