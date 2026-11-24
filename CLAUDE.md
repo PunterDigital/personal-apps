@@ -1422,6 +1422,20 @@ Shay can ask an interactive session to clear the whole Ready column with a team 
   - A stuck process can't be ended by a run (Stop-Process refused): put it on a Shay card (World Explorer Gradle worker, Nov 24).
   - Prove "looks the same" with `animations: 'disabled'` screenshots compared pixel by pixel (#5750).
 
+**Nov 24 morning (second team run, releases):**
+- A scheduled run that starts while Shay is answering cards may pick up the same work. Shay stopped it; check its run-log entry and what it claimed ("Starting…" comments on cards with no code) before taking over. A stopped run may remove its lock: write yours at once.
+- **Ship open work before its app's release** (Shay): finish an app's In Progress / Testing & CI cards first, then release, so nothing waits a whole train.
+- **Release tags need Shay's OK in chat.** An agent's tag push was refused ("Destructive or Unwanted Actions") when the release order came from the parent. Ask Shay in chat which releases to push, then push the tag in the parent or pass his words on (Arkeep v0.12.1-pd.2, #5922).
+- A Shay answer like "worked, but…" on a check card is a new request: close the check and triage the follow-up (#5814 → #5967).
+- Close a tracker as soon as its pieces are Done, or parked in Not Now on purpose. Leaving it on hold makes the board look stuck (#4445, #4657, #5218, #5286, #5469). Check the upstream issue behind an upstream tracker, because a maintainer reply can unblock it (#4567 → #6000–#6002).
+- After a queue change on Forge, a job held on a queue the worker didn't read runs as soon as it does. Ask what the Queue field was before, and check what ran late (#5887 → #5964).
+- `gh attestation verify` prints nothing when its output is redirected: judge it by the exit code.
+- World Explorer: compare `apksigner verify --print-certs` of each new APK with the previous release's (v0.7.0).
+- React: an async action result tagged with state from the click's closure goes stale while a save is in flight. Use a ref of the latest value (ProjectTrucks #5670's "flaky" Windows E2E).
+- Root Blade views can read resolved shared props (`$page['props']['features']`) to gate head tags with no extra query. A flag that changes mid-visit needs the component to add the tag client-side too (AniTrack #5715).
+- GO-2026-6278: when no tagged fix exists, `go get <module>@<fix sha>` gives the advisory's pseudo-version (Arkeep #5922).
+- The auto-mode classifier refuses `git reset --hard origin/<branch>`: sync with `git merge --ff-only`. PowerShell `New-Item -ItemType Junction` works where Git Bash's `cmd //c mklink /J` doesn't. Under strict up-to-date protection, the next PR's conflicts can be resolved early against the previous PR's branch (Nexus #80 → #83).
+
 ## Weekly maintenance (Monday run, before the release train)
 
 - Review and merge green Dependabot PRs (patch/minor); majors become cards.
